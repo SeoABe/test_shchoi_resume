@@ -128,8 +128,12 @@
     ════════════════════════════════════════ */
     #section-hero {
       background: var(--white);
+    }
+    .hero-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 60px 40px 0;
       display: grid; grid-template-columns: 1fr 480px;
-      padding-top: 60px;
       overflow: hidden;
     }
     .hero-copy {
@@ -617,6 +621,7 @@
        순환 증거 문구 + 강사 이름 + 태그라인 + CTA
   ══════════════════════════════════════ -->
   <section id="section-hero">
+    <div class="hero-inner">
     <div class="hero-copy">
       <!-- 순환 증거 문구 -->
       <div class="hero-rotating-wrap">
@@ -639,6 +644,7 @@
     </div>
 
     <img src="assets/choi-instructor-profile.png" alt="최상훈 강사" class="hero-photo" style="object-fit:cover; object-position:center 10%; width:100%; height:100%;" />
+    </div>
   </section>
 
 
