@@ -1,0 +1,1 @@
+window.SANGHUN_CHAT_API_URL = window.SANGHUN_CHAT_API_URL || '';

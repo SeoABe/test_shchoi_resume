@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>바이브 코딩 스킬 레퍼런스 — 최상훈 AX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oxygen:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Oxygen', sans-serif;
+      font-size: 15px; line-height: 1.7; letter-spacing: 0.6px;
+      color: #6e777a; background: #fff;
+      word-break: keep-all; overflow-wrap: break-word;
+    }
+    img { max-width: 100%; display: block; }
+    a   { color: inherit; text-decoration: none; }
+    code, pre { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+
+    :root {
+      --black:      #1e1e1e;
+      --white:      #ffffff;
+      --gray-body:  #6e777a;
+      --gray-light: #f5f5f5;
+      --border:     #e0e0e0;
+      --max-w:      1120px;
+      --accent:     #4f46e5;
+    }
+
+    /* ── Layout ── */
+    .wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 40px; }
+
+    /* ── Fade-in ── */
+    .fade-up { opacity: 0; transform: translateY(24px); transition: opacity .5s ease, transform .5s ease; }
+    .fade-up.visible { opacity: 1; transform: none; }
+
+    /* ══ TOP NAV ══ */
+    #topnav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 56px; background: rgba(255,255,255,0.96);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+    }
+    #topnav .wrap {
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
+    }
+    .nav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px; letter-spacing: 3px; color: var(--black);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-badge {
+      font-family: 'Oxygen', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      background: var(--black); color: #fff;
+      padding: 3px 8px; text-transform: uppercase;
+    }
+    .nav-count {
+      font-size: 11px; letter-spacing: 1px; color: var(--gray-body);
+    }
+    .nav-home {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--black);
+      border: 1.5px solid var(--black); padding: 6px 16px;
+    }
+    .nav-home:hover { background: var(--black); color: #fff; }
+
+    /* ══ HERO ══ */
+    #hero {
+      padding: 120px 0 80px;
+      background: var(--black);
+    }
+    .hero-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; color: rgba(255,255,255,.4);
+      margin-bottom: 20px; display: block;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 8vw, 104px);
+      letter-spacing: 4px; line-height: 1;
+      color: #fff; margin-bottom: 24px;
+    }
+    .hero-title em { color: rgba(255,255,255,.2); font-style: normal; }
+    .hero-desc { color: rgba(255,255,255,.45); max-width: 520px; margin-bottom: 48px; }
+    .hero-stats {
+      display: flex; gap: 48px; flex-wrap: wrap;
+    }
+    .hero-stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 40px; letter-spacing: 2px; color: #fff; line-height: 1;
+    }
+    .hero-stat-label {
+      font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,.4);
+      margin-top: 4px;
+    }
+
+    /* ══ SKILL MAP (TOC) ══ */
+    #skill-map { background: var(--gray-light); padding: 64px 0; border-bottom: 1px solid var(--border); }
+    .map-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px; letter-spacing: 3px; color: var(--black);
+      margin-bottom: 32px;
+    }
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 2px;
+    }
+    .map-item {
+      background: #fff; padding: 20px 24px;
+      display: flex; align-items: center; gap: 16px;
+      border: 1px solid transparent;
+      cursor: pointer; transition: border-color .2s, background .2s;
+      text-decoration: none;
+    }
+    .map-item:hover { border-color: var(--black); }
+    .map-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px; letter-spacing: 1px; color: var(--border);
+      flex-shrink: 0; line-height: 1;
+    }
+    .map-info {}
+    .map-item-title { font-size: 13px; font-weight: 700; color: var(--black); }
+    .map-item-sub   { font-size: 11px; color: var(--gray-body); margin-top: 2px; }
+
+    /* ══ SECTION COMMON ══ */
+    .skill-section { padding: 96px 0; border-bottom: 1px solid var(--border); }
+    .skill-section:nth-child(even) { background: var(--gray-light); }
+    .skill-section:nth-child(odd)  { background: var(--white); }
+
+    .sec-eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--gray-body);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+    }
+    .sec-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 14px; letter-spacing: 1px;
+      background: var(--black); color: #fff;
+      padding: 2px 8px;
+    }
+    .sec-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 5vw, 56px);
+      letter-spacing: 3px; color: var(--black); line-height: 1;
+      margin-bottom: 16px;
+    }
+    .sec-desc { max-width: 560px; margin-bottom: 48px; }
+
+    /* ══ CODE BLOCK ══ */
+    .code-block {
+      background: #111; border-radius: 0;
+      overflow: hidden; margin-bottom: 24px;
+    }
+    .code-header {
+      background: #1e1e1e; padding: 10px 20px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid #333;
+    }
+    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .code-dot.r { background: #ff5f57; }
+    .code-dot.y { background: #ffbd2e; }
+    .code-dot.g { background: #28c840; }
+    .code-filename {
+      font-size: 11px; color: rgba(255,255,255,.35);
+      letter-spacing: 1px; margin-left: 8px;
+    }
+    .code-body {
+      padding: 24px 20px;
+      font-size: 12.5px; line-height: 1.9; color: #ccc;
+      overflow-x: auto;
+    }
+    .code-body .kw  { color: #7dd3fc; }
+    .code-body .str { color: #86efac; }
+    .code-body .cm  { color: #4b5563; font-style: italic; }
+    .code-body .hl  { color: #fcd34d; }
+    .code-body .pk  { color: #f9a8d4; }
+    .code-body .num { color: #fb923c; }
+    .code-body .sel { color: #c4b5fd; }
+
+    /* ══ TOKEN TABLE ══ */
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 2px; margin-bottom: 32px;
+    }
+    .token-item {
+      border: 1px solid var(--border); padding: 16px 20px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .token-swatch {
+      width: 36px; height: 36px; flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+    .token-name  { font-size: 11px; font-weight: 700; color: var(--black); letter-spacing: 1px; }
+    .token-value { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--gray-body); }
+
+    /* ══ TYPO TABLE ══ */
+    .typo-table { width: 100%; border-collapse: collapse; }
+    .typo-table th {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gray-body);
+      border-bottom: 2px solid var(--black); padding: 12px 0; text-align: left;
+    }
+    .typo-table td {
+      font-size: 13px; color: var(--black);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0 14px 0; vertical-align: top;
+    }
+    .typo-table td:first-child { color: var(--gray-body); }
+    .typo-table code { font-size: 11px; background: var(--gray-light); padding: 2px 6px; }
+
+    /* ══ BREAKPOINT VIZ ══ */
+    .bp-bars { display: flex; flex-direction: column; gap: 16px; }
+    .bp-bar  { display: flex; align-items: center; gap: 20px; }
+    .bp-label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--black); min-width: 80px; }
+    .bp-track { flex: 1; height: 8px; background: var(--border); position: relative; }
+    .bp-fill  { height: 100%; background: var(--black); }
+    .bp-desc  { font-size: 12px; color: var(--gray-body); min-width: 200px; }
+
+    /* ══ COMPONENT CARDS ══ */
+    .comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .comp-card { border: 1px solid var(--border); }
+    .comp-card-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gray-body);
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+      background: var(--gray-light);
+    }
+    .comp-preview { padding: 32px 24px; }
+
+    /* live concept-card preview */
+    .preview-concept-card {
+      border: 1px solid var(--border); padding: 20px;
+      display: inline-block;
+    }
+    .preview-concept-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .preview-concept-icon  { font-size: 1.4rem; line-height: 1; }
+    .preview-concept-title { font-size: 14px; font-weight: 700; color: var(--black); }
+    .preview-concept-desc  { font-size: 12px; color: var(--gray-body); }
+
+    /* live module-item preview */
+    .preview-module-item {
+      display: flex; align-items: flex-start; gap: 16px;
+      border: 1px solid var(--border); padding: 16px 20px;
+    }
+    .preview-module-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      padding: 3px 10px; flex-shrink: 0; margin-top: 2px;
+      background: #EEF2FF; color: #4F46E5;
+    }
+    .preview-module-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 4px; }
+    .preview-module-title  { font-size: 13px; font-weight: 700; color: var(--black); }
+    .preview-module-time   { font-size: 11px; color: var(--gray-body); flex-shrink: 0; }
+    .preview-module-sub    { font-size: 12px; color: var(--gray-body); }
+
+    /* ══ DEMO CARD preview ══ */
+    .demo-card-preview {
+      background: #111; color: #fff;
+      padding: 28px 24px; text-align: center;
+      display: inline-block; min-width: 200px;
+    }
+    .dc-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .dc-sub   { font-size: 12px; color: rgba(255,255,255,.5); margin-bottom: 10px; }
+    .dc-hint  { font-size: 11px; color: rgba(255,255,255,.3); }
+
+    /* ══ DARK/LIGHT TOGGLE DEMO ══ */
+    .theme-demo {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+    }
+    .theme-panel {
+      padding: 32px; display: flex; flex-direction: column; gap: 12px;
+    }
+    .theme-panel.light { background: #fff; border: 1px solid var(--border); }
+    .theme-panel.dark  { background: #0f172a; }
+    .theme-panel-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .theme-panel.light .theme-panel-label { color: var(--gray-body); }
+    .theme-panel.dark  .theme-panel-label { color: rgba(255,255,255,.4); }
+    .theme-swatch { display: flex; flex-direction: column; gap: 4px; }
+    .ts-row { display: flex; align-items: center; gap: 10px; }
+    .ts-box { width: 28px; height: 28px; border: 1px solid rgba(0,0,0,.1); flex-shrink: 0; }
+    .ts-info { font-size: 11px; }
+
+    /* ══ MARKDOWN RENDER DEMO ══ */
+    .md-demo {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+    }
+    .md-panel { padding: 24px; }
+    .md-panel.input  { background: #111; }
+    .md-panel.output { background: var(--gray-light); border: 1px solid var(--border); }
+    .md-panel-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 16px;
+    }
+    .md-panel.input  .md-panel-label { color: rgba(255,255,255,.35); }
+    .md-panel.output .md-panel-label { color: var(--gray-body); }
+    .md-raw  { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #aaa; line-height: 1.8; }
+    .md-rendered { font-size: 13px; color: var(--black); line-height: 1.8; }
+
+    /* ══ FAQ DEMO ══ */
+    .faq-demo-item { border-top: 1px solid var(--border); }
+    .faq-demo-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-demo-q {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 0; cursor: pointer; gap: 16px;
+    }
+    .faq-demo-q span { font-size: 14px; color: var(--black); font-weight: 700; }
+    .faq-demo-toggle {
+      font-size: 18px; color: var(--gray-body); flex-shrink: 0;
+      transition: transform .3s;
+    }
+    .faq-demo-item.open .faq-demo-toggle { transform: rotate(45deg); }
+    .faq-demo-a {
+      font-size: 13px; color: var(--gray-body); line-height: 1.8;
+      max-height: 0; overflow: hidden; transition: max-height .4s ease, padding .3s;
+    }
+    .faq-demo-item.open .faq-demo-a { max-height: 200px; padding-bottom: 18px; }
+
+    /* ══ MODAL DEMO ══ */
+    .modal-trigger-area {
+      border: 1px dashed var(--border); padding: 32px;
+      text-align: center;
+    }
+    .btn-demo {
+      display: inline-block;
+      font-family: 'Oxygen', sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 12px 28px; cursor: pointer; border: none;
+      background: var(--black); color: #fff;
+    }
+    .btn-demo:hover { background: #333; }
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.65); z-index: 900;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff; width: 480px; max-width: 90vw;
+      max-height: 80vh; overflow: auto;
+    }
+    .modal-head {
+      background: var(--black); padding: 32px;
+      position: relative; overflow: hidden;
+      padding-bottom: 48px;
+    }
+    .modal-head::after {
+      content: '';
+      position: absolute; bottom: -20px; left: -10%; right: -10%;
+      height: 40px;
+      background: #fff;
+      transform: skewY(-2deg);
+      z-index: 0;
+    }
+    .modal-head-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px; letter-spacing: 2px; color: #fff;
+      position: relative; z-index: 1;
+    }
+    .modal-head-sub {
+      font-size: 12px; color: rgba(255,255,255,.5);
+      position: relative; z-index: 1; margin-top: 6px;
+    }
+    .modal-body { padding: 32px; }
+    .modal-form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+    .modal-form-group label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gray-body);
+    }
+    .modal-form-group input {
+      font-family: 'Oxygen', sans-serif; font-size: 14px;
+      color: var(--black); background: var(--gray-light);
+      border: none; border-bottom: 1.5px solid var(--border);
+      padding: 10px 0; outline: none;
+    }
+    .modal-form-group input:focus { border-bottom-color: var(--black); }
+    .modal-close-btn {
+      width: 100%; padding: 14px;
+      background: var(--black); color: #fff;
+      font-family: 'Oxygen', sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; border: none; cursor: pointer;
+      margin-top: 8px;
+    }
+
+    /* ══ DEEPLINK VIZ ══ */
+    .deeplink-flow {
+      display: flex; align-items: center; gap: 0; flex-wrap: wrap;
+    }
+    .dl-step {
+      background: #111; color: #fff;
+      padding: 16px 20px; flex: 1; min-width: 150px;
+      font-size: 12px; line-height: 1.6;
+    }
+    .dl-step strong { display: block; font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,.4); margin-bottom: 6px; }
+    .dl-arrow {
+      background: var(--black); color: rgba(255,255,255,.4);
+      font-size: 18px; padding: 16px 12px; align-self: stretch;
+      display: flex; align-items: center;
+    }
+
+    /* ══ FOOTER ══ */
+    #foot {
+      background: var(--black); padding: 48px 0;
+    }
+    #foot .wrap {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+    }
+    .foot-left {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; letter-spacing: 3px; color: rgba(255,255,255,.2);
+    }
+    .foot-right { font-size: 11px; color: rgba(255,255,255,.3); letter-spacing: 1px; }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 768px) {
+      .wrap { padding: 0 20px; }
+      .comp-grid { grid-template-columns: 1fr; }
+      .md-demo   { grid-template-columns: 1fr; }
+      .theme-demo{ grid-template-columns: 1fr; }
+      .hero-stats { gap: 28px; }
+      .deeplink-flow { flex-direction: column; }
+      .dl-arrow { display: none; }
+    }
+
+    /* ══ PROGRESS BAR ══ */
+    #progress-bar {
+      position: fixed; top: 56px; left: 0; right: 0;
+      height: 3px; background: var(--border); z-index: 199;
+    }
+    #progress-fill { height: 100%; background: var(--black); width: 0%; transition: width .1s; }
+
+    /* ══ SCROLL-TO-TOP ══ */
+    #scroll-top {
+      position: fixed; bottom: 32px; right: 32px; z-index: 300;
+      width: 44px; height: 44px;
+      background: var(--black); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity .3s, transform .3s;
+    }
+    #scroll-top.show { opacity: 1; transform: none; }
+
+    /* troubleshooting table */
+    .ts-table { width: 100%; border-collapse: collapse; }
+    .ts-table th {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gray-body); border-bottom: 2px solid var(--black);
+      padding: 12px 8px; text-align: left;
+    }
+    .ts-table td {
+      font-size: 12px; color: var(--black);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 8px; vertical-align: top;
+    }
+    .ts-table td:first-child { color: #dc2626; font-weight: 700; }
+    .ts-table td:nth-child(2) { color: var(--gray-body); }
+    .ts-table td:last-child { color: #16a34a; font-weight: 700; }
+    .ts-table code { font-size: 10px; background: var(--gray-light); padding: 1px 5px; }
+
+    /* custom select preview */
+    .custom-select-wrap { position: relative; width: 220px; }
+    .custom-select-display {
+      border: none; border-bottom: 1.5px solid var(--border);
+      padding: 12px 0; font-size: 14px; color: var(--black);
+      cursor: pointer; user-select: none;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--gray-light); padding-left: 8px;
+    }
+    .custom-select-display.open { border-bottom-color: var(--black); }
+    .custom-select-dropdown {
+      display: none; position: absolute; top: 100%; left: 0; right: 0;
+      background: #fff; border: 1px solid var(--border); z-index: 10;
+    }
+    .custom-select-dropdown.open { display: block; }
+    .custom-select-option {
+      padding: 10px 12px; font-size: 13px; color: var(--black); cursor: pointer;
+    }
+    .custom-select-option:hover { background: var(--gray-light); }
+
+    /* faq more btn */
+    .faq-more-btn-demo {
+      margin-top: 12px; font-size: 13px; font-weight: 700;
+      color: var(--black); cursor: pointer;
+      border: 1px solid var(--border); padding: 10px 24px;
+      background: transparent; letter-spacing: 1px;
+    }
+    .faq-more-btn-demo:hover { background: var(--black); color: #fff; border-color: var(--black); }
+  </style>
+</head>
+<body>
+
+  <!-- Progress Bar -->
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+
+  <!-- Scroll Top -->
+  <div id="scroll-top" title="맨 위로">↑</div>
+
+  <!-- ══ TOP NAV ══ -->
+  <nav id="topnav">
+    <div class="wrap">
+      <div class="nav-brand">
+        <img src="assets/sanghun-ax-logo-header.png" alt="sanghun ax" style="height:30px;width:auto;" />
+        <span class="nav-badge">Skill Ref</span>
+      </div>
+      <span class="nav-count">13 Topics · Vibe Coding 2025</span>
+      <a href="index.html" class="nav-home">← 홈으로</a>
+    </div>
+  </nav>
+
+
+  <!-- ══ HERO ══ -->
+  <section id="hero">
+    <div class="wrap">
+      <span class="hero-label">바이브 코딩 실습 — 작업 기록</span>
+      <h1 class="hero-title">SKILL<br /><em>REFERENCE</em></h1>
+      <p class="hero-desc">강사 소개 홈페이지 제작 과정에서 사용한 기술 패턴 13가지를 한눈에 확인할 수 있는 인터랙티브 레퍼런스입니다.</p>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num">13</div>
+          <div class="hero-stat-label">Topics</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">CSS</div>
+          <div class="hero-stat-label">Design Tokens</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">JS</div>
+          <div class="hero-stat-label">Interactivity</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">AI</div>
+          <div class="hero-stat-label">Serverless API</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ SKILL MAP (TOC) ══ -->
+  <section id="skill-map">
+    <div class="wrap">
+      <div class="map-title">SKILL MAP</div>
+      <div class="map-grid">
+        <a href="#s1" class="map-item">
+          <div class="map-num">01</div>
+          <div class="map-info"><div class="map-item-title">프로젝트 구조</div><div class="map-item-sub">파일 아키텍처</div></div>
+        </a>
+        <a href="#s2" class="map-item">
+          <div class="map-num">02</div>
+          <div class="map-info"><div class="map-item-title">CSS 디자인 토큰</div><div class="map-item-sub">라이트 · 다크 시스템</div></div>
+        </a>
+        <a href="#s3" class="map-item">
+          <div class="map-num">03</div>
+          <div class="map-info"><div class="map-item-title">타이포그래피</div><div class="map-item-sub">계층별 규칙</div></div>
+        </a>
+        <a href="#s4" class="map-item">
+          <div class="map-num">04</div>
+          <div class="map-info"><div class="map-item-title">반응형 레이아웃</div><div class="map-item-sub">브레이크포인트 전략</div></div>
+        </a>
+        <a href="#s5" class="map-item">
+          <div class="map-num">05</div>
+          <div class="map-info"><div class="map-item-title">배경색 통일</div><div class="map-item-sub">섹션별 색상 전략</div></div>
+        </a>
+        <a href="#s6" class="map-item">
+          <div class="map-num">06</div>
+          <div class="map-info"><div class="map-item-title">컴포넌트 패턴</div><div class="map-item-sub">카드 · 모듈 · 경력</div></div>
+        </a>
+        <a href="#s7" class="map-item">
+          <div class="map-num">07</div>
+          <div class="map-info"><div class="map-item-title">AI 플레이그라운드</div><div class="map-item-sub">Serverless API 프록시</div></div>
+        </a>
+        <a href="#s8" class="map-item">
+          <div class="map-num">08</div>
+          <div class="map-info"><div class="map-item-title">다크/라이트 토글</div><div class="map-item-sub">localStorage 저장</div></div>
+        </a>
+        <a href="#s9" class="map-item">
+          <div class="map-num">09</div>
+          <div class="map-info"><div class="map-item-title">로고 가시성</div><div class="map-item-sub">drop-shadow 트릭</div></div>
+        </a>
+        <a href="#s10" class="map-item">
+          <div class="map-num">10</div>
+          <div class="map-info"><div class="map-item-title">모달 시스템</div><div class="map-item-sub">커스텀 셀렉트 · 약관</div></div>
+        </a>
+        <a href="#s11" class="map-item">
+          <div class="map-num">11</div>
+          <div class="map-info"><div class="map-item-title">FAQ 더 보기</div><div class="map-item-sub">아코디언 패턴</div></div>
+        </a>
+        <a href="#s12" class="map-item">
+          <div class="map-num">12</div>
+          <div class="map-info"><div class="map-item-title">푸터 구성</div><div class="map-item-sub">당근 딥링크</div></div>
+        </a>
+        <a href="#s13" class="map-item">
+          <div class="map-num">13</div>
+          <div class="map-info"><div class="map-item-title">트러블슈팅</div><div class="map-item-sub">12개 버그 & 해결</div></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       01 — 프로젝트 구조
+  ══════════════════════════════════════ -->
+  <section id="s1" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">01</span> Project Structure</div>
+      <h2 class="sec-title">프로젝트<br />구조</h2>
+      <p class="sec-desc">Vercel 정적 + 서버리스 함수 배포 구조. API 키를 클라이언트에 노출하지 않는 프록시 패턴이 핵심입니다.</p>
+      <div class="code-block fade-up">
+        <div class="code-header">
+          <div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div>
+          <span class="code-filename">project-tree.txt</span>
+        </div>
+        <div class="code-body"><pre>260528_vibecoding_lec/
+├── <span class="kw">index.html</span>          <span class="cm"># 메인 단일 파일 (HTML + CSS + JS 통합)</span>
+├── <span class="kw">enterprise.html</span>     <span class="cm"># 기업 출강 페이지</span>
+├── api/
+│   └── <span class="hl">query.js</span>        <span class="cm"># Vercel Serverless Function (AI API 프록시)</span>
+├── images/
+│   └── logo.png
+├── <span class="pk">.env</span>                <span class="cm"># API 키 (절대 커밋 금지 ⚠️)</span>
+├── .gitignore
+└── <span class="str">vercel.json</span></pre></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
+        <div class="code-block fade-up" style="margin-bottom:0;">
+          <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">vercel.json</span></div>
+          <div class="code-body"><pre>{
+  <span class="str">"routes"</span>: [
+    {
+      <span class="str">"src"</span>: <span class="str">"/api/(.*)"</span>,
+      <span class="str">"dest"</span>: <span class="str">"/api/$1"</span>
+    }
+  ]
+}</pre></div>
+        </div>
+        <div class="code-block fade-up" style="margin-bottom:0;">
+          <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">배포 명령어</span></div>
+          <div class="code-body"><pre><span class="cm"># 프리뷰 배포</span>
+$ <span class="kw">vercel</span>
+
+<span class="cm"># 프로덕션 배포</span>
+$ <span class="kw">vercel</span> <span class="hl">--prod</span></pre></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       02 — CSS 디자인 토큰
+  ══════════════════════════════════════ -->
+  <section id="s2" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">02</span> CSS Design Tokens</div>
+      <h2 class="sec-title">CSS 디자인<br />토큰 시스템</h2>
+      <p class="sec-desc">라이트/다크 두 가지 모드를 CSS 변수로 제어합니다. <code>--white</code>는 배경/서피스 토큰이므로 다크 모드에서 <code>#0F172A</code>가 됩니다.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:40px;" class="fade-up">
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray-body);margin-bottom:16px;">라이트 모드 <code>:root</code></div>
+          <div class="token-grid" style="grid-template-columns:1fr;">
+            <div class="token-item"><div class="token-swatch" style="background:#4F46E5;border:none;"></div><div><div class="token-name">--primary</div><div class="token-value">#4F46E5</div></div></div>
+            <div class="token-item"><div class="token-swatch" style="background:#F59E0B;border:none;"></div><div><div class="token-name">--accent</div><div class="token-value">#F59E0B</div></div></div>
+            <div class="token-item"><div class="token-swatch" style="background:#1A1A2E;border:none;"></div><div><div class="token-name">--text-heading</div><div class="token-value">#1A1A2E</div></div></div>
+            <div class="token-item"><div class="token-swatch" style="background:#374151;border:none;"></div><div><div class="token-name">--gray-700</div><div class="token-value">#374151</div></div></div>
+            <div class="token-item"><div class="token-swatch" style="background:#6B7280;border:none;"></div><div><div class="token-name">--gray-500</div><div class="token-value">#6B7280</div></div></div>
+            <div class="token-item"><div class="token-swatch" style="background:#F4F6FA;"></div><div><div class="token-name">--gray-100</div><div class="token-value">#F4F6FA</div></div></div>
+            <div class="token-item"><div class="token-swatch" style="background:#FFFFFF;"></div><div><div class="token-name">--white</div><div class="token-value">#FFFFFF</div></div></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray-body);margin-bottom:16px;">다크 모드 <code>[data-theme="dark"]</code></div>
+          <div class="token-grid" style="grid-template-columns:1fr;">
+            <div class="token-item" style="background:#1e293b;border-color:#334155;"><div class="token-swatch" style="background:#F1F5F9;border-color:#475569;"></div><div><div class="token-name" style="color:#f1f5f9;">--text-heading</div><div class="token-value" style="color:#64748b;">#F1F5F9</div></div></div>
+            <div class="token-item" style="background:#1e293b;border-color:#334155;"><div class="token-swatch" style="background:#CBD5E1;border-color:#475569;"></div><div><div class="token-name" style="color:#f1f5f9;">--gray-700</div><div class="token-value" style="color:#64748b;">#CBD5E1</div></div></div>
+            <div class="token-item" style="background:#1e293b;border-color:#334155;"><div class="token-swatch" style="background:#94A3B8;border-color:#475569;"></div><div><div class="token-name" style="color:#f1f5f9;">--gray-500</div><div class="token-value" style="color:#64748b;">#94A3B8</div></div></div>
+            <div class="token-item" style="background:#1e293b;border-color:#334155;"><div class="token-swatch" style="background:#1E293B;border-color:#475569;"></div><div><div class="token-name" style="color:#f1f5f9;">--gray-100</div><div class="token-value" style="color:#64748b;">#1E293B</div></div></div>
+            <div class="token-item" style="background:#1e293b;border-color:#334155;"><div class="token-swatch" style="background:#0F172A;border-color:#475569;"></div><div><div class="token-name" style="color:#f1f5f9;">--white → 배경</div><div class="token-value" style="color:#64748b;">#0F172A</div></div></div>
+          </div>
+          <div style="margin-top:16px;padding:12px 16px;background:#0f172a;border:1px solid #334155;font-size:12px;color:#94a3b8;line-height:1.8;">
+            ⚠️ 버튼 텍스트처럼 항상 흰색이어야 하는 곳은<br /><code style="color:#86efac;">color: #fff</code> 고정값 사용
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block fade-up">
+        <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">tokens.css</span></div>
+        <div class="code-body"><pre><span class="sel">:root</span> {
+  <span class="kw">--primary</span>:      <span class="str">#4F46E5</span>;
+  <span class="kw">--text-heading</span>: <span class="str">#1A1A2E</span>;
+  <span class="kw">--white</span>:        <span class="str">#FFFFFF</span>; <span class="cm">/* 배경/서피스 토큰 */</span>
+}
+
+<span class="sel">[data-theme="dark"]</span> {
+  <span class="kw">--text-heading</span>: <span class="str">#F1F5F9</span>;
+  <span class="kw">--white</span>:        <span class="str">#0F172A</span>; <span class="cm">/* 다크 배경으로 자동 전환 */</span>
+}</pre></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       03 — 타이포그래피
+  ══════════════════════════════════════ -->
+  <section id="s3" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">03</span> Typography</div>
+      <h2 class="sec-title">타이포그래피<br />규칙</h2>
+      <p class="sec-desc"><code>clamp()</code>로 뷰포트에 반응하는 유동 폰트 크기를 적용합니다.</p>
+      <div class="fade-up" style="overflow-x:auto;">
+        <table class="typo-table">
+          <thead>
+            <tr>
+              <th>목적</th>
+              <th>클래스 / 요소</th>
+              <th>크기</th>
+              <th>색상 토큰</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>페이지 주 제목</td><td><code>h1.hero-headline</code></td><td><code>clamp(2rem, 5vw, 3.5rem)</code></td><td>그라디언트</td></tr>
+            <tr><td>섹션 제목</td><td><code>h2.section-title</code></td><td><code>clamp(1.6rem, 3vw, 2.25rem)</code></td><td><code>--text-heading</code></td></tr>
+            <tr><td>서브 제목</td><td><code>h3</code>, <code>.concept-card-title</code></td><td><code>1.0~1.1rem</code></td><td><code>--text-heading</code></td></tr>
+            <tr><td>본문 설명</td><td><code>p.section-desc</code></td><td><code>0.95rem</code></td><td><code>--gray-500</code></td></tr>
+            <tr><td>리스트/카드</td><td><code>.career-list li</code></td><td><code>0.9~0.95rem</code></td><td><code>--text-heading</code> / <code>--gray-700</code></td></tr>
+            <tr><td>라벨/메타</td><td><code>.module-time</code>, <code>.eyebrow</code></td><td><code>0.75~0.8rem</code></td><td><code>--gray-500</code> / <code>--primary</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-block fade-up" style="margin-top:32px;">
+        <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">clamp 예시</span></div>
+        <div class="code-body"><pre><span class="sel">.hero-name</span> {
+  font-size: <span class="hl">clamp</span>(<span class="num">72px</span>, <span class="num">10vw</span>, <span class="num">120px</span>);
+}
+<span class="sel">.ax-title</span> {
+  font-size: <span class="hl">clamp</span>(<span class="num">56px</span>, <span class="num">7vw</span>, <span class="num">88px</span>);
+}</pre></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       04 — 반응형 레이아웃
+  ══════════════════════════════════════ -->
+  <section id="s4" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">04</span> Responsive Layout</div>
+      <h2 class="sec-title">반응형<br />레이아웃</h2>
+      <p class="sec-desc">3개의 브레이크포인트와 모바일 줄바꿈 헬퍼 클래스로 반응형을 처리합니다.</p>
+      <div class="bp-bars fade-up" style="margin-bottom:40px;">
+        <div class="bp-bar">
+          <span class="bp-label">768px↓</span>
+          <div class="bp-track"><div class="bp-fill" style="width:65%;"></div></div>
+          <span class="bp-desc">태블릿 — 2열→1열, 햄버거 메뉴</span>
+        </div>
+        <div class="bp-bar">
+          <span class="bp-label">480px↓</span>
+          <div class="bp-track"><div class="bp-fill" style="width:40%;"></div></div>
+          <span class="bp-desc">모바일 — 패딩 축소, 히어로 세로 정렬</span>
+        </div>
+        <div class="bp-bar">
+          <span class="bp-label">360px↓</span>
+          <div class="bp-track"><div class="bp-fill" style="width:20%;"></div></div>
+          <span class="bp-desc">소형 — 폰트 크기 추가 축소</span>
+        </div>
+      </div>
+      <div class="code-block fade-up">
+        <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">mobile-br-helper.css + html</span></div>
+        <div class="code-body"><pre><span class="cm">/* CSS */</span>
+<span class="sel">.mo-br</span> { display: <span class="str">none</span>; }
+<span class="kw">@media</span> (max-width: <span class="num">768px</span>) {
+  <span class="sel">.mo-br</span> { display: <span class="str">block</span>; }
+}
+
+<span class="cm">/* HTML — PC: 한 줄 / 모바일: 줄바꿈 */</span>
+AI Transformation, &lt;<span class="kw">br</span> class=<span class="str">"mo-br"</span>&gt;왜 지금인가?</pre></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       05 — 배경색 통일
+  ══════════════════════════════════════ -->
+  <section id="s5" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">05</span> Background Color Strategy</div>
+      <h2 class="sec-title">배경색<br />통일 전략</h2>
+      <p class="sec-desc">모든 섹션 배경을 <code>var(--white)</code> 토큰 하나로 통일해 다크 모드 전환을 자동으로 처리합니다.</p>
+      <div class="theme-demo fade-up">
+        <div class="theme-panel light">
+          <div class="theme-panel-label">☀️ 라이트 모드</div>
+          <div style="background:#ffffff;border:1px solid #e0e0e0;padding:16px 20px;margin-bottom:8px;">
+            <div style="font-size:11px;color:#6e777a;margin-bottom:4px;">섹션 배경</div>
+            <div style="font-size:14px;font-weight:700;color:#1e1e1e;">var(--white) = #FFFFFF</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#EEF2FF,#E0E7FF,#EDE9FE);padding:16px 20px;">
+            <div style="font-size:11px;color:#4f46e5;margin-bottom:4px;">히어로 예외</div>
+            <div style="font-size:14px;font-weight:700;color:#1e1e1e;">linear-gradient 연한 보라</div>
+          </div>
+        </div>
+        <div class="theme-panel dark">
+          <div class="theme-panel-label">🌙 다크 모드</div>
+          <div style="background:#0f172a;border:1px solid #334155;padding:16px 20px;margin-bottom:8px;">
+            <div style="font-size:11px;color:#475569;margin-bottom:4px;">섹션 배경</div>
+            <div style="font-size:14px;font-weight:700;color:#f1f5f9;">var(--white) = #0F172A</div>
+          </div>
+          <div style="background:#0f172a;border:1px solid #334155;padding:16px 20px;">
+            <div style="font-size:11px;color:#475569;margin-bottom:4px;">히어로 동일</div>
+            <div style="font-size:14px;font-weight:700;color:#f1f5f9;">var(--white) = #0F172A</div>
+          </div>
+        </div>
+      </div>
+      <div class="code-block fade-up" style="margin-top:24px;">
+        <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">bg-unify.css</span></div>
+        <div class="code-body"><pre><span class="cm">/* 라이트: 회색 섹션도 흰색으로 */</span>
+<span class="sel">.section-wrap-gray</span>, <span class="sel">#section-playground</span> {
+  background: <span class="kw">var</span>(--white);
+}
+
+<span class="cm">/* 다크: 동일 규칙이 #0F172A로 자동 적용 */</span>
+<span class="sel">[data-theme="dark"] .section-wrap-gray</span>,
+<span class="sel">[data-theme="dark"] #section-playground</span> {
+  background: <span class="kw">var</span>(--white);
+}</pre></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       06 — 컴포넌트 패턴
+  ══════════════════════════════════════ -->
+  <section id="s6" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">06</span> Component Patterns</div>
+      <h2 class="sec-title">컴포넌트<br />패턴</h2>
+      <p class="sec-desc">개념 카드, 모듈 아이템, 데모 카드 — 재사용 가능한 3가지 핵심 패턴입니다.</p>
+      <div class="comp-grid fade-up">
+
+        <div class="comp-card">
+          <div class="comp-card-label">01 개념 카드 — 이모지 + 제목 인라인</div>
+          <div class="comp-preview">
+            <div class="preview-concept-card">
+              <div class="preview-concept-header">
+                <div class="preview-concept-icon">🤖</div>
+                <div class="preview-concept-title">AI 도구 활용</div>
+              </div>
+              <div class="preview-concept-desc">ChatGPT · Gemini · Claude</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-label">02 모듈 아이템 — 뱃지 + 2줄 콘텐츠</div>
+          <div class="comp-preview">
+            <div class="preview-module-item">
+              <span class="preview-module-badge">입문</span>
+              <div style="flex:1;">
+                <div class="preview-module-header">
+                  <span class="preview-module-title">Module 1 · AI 도구 기초</span>
+                  <span class="preview-module-time">30분</span>
+                </div>
+                <div class="preview-module-sub">ChatGPT · Gemini · Claude 첫 걸음</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-label">03 데모 카드 — 다크/라이트 대응 클래스</div>
+          <div class="comp-preview">
+            <div class="demo-card-preview">
+              <div style="font-size:1.6rem;margin-bottom:10px;">📱</div>
+              <div class="dc-title">SNS 콘텐츠 쿼리</div>
+              <div class="dc-sub">인스타그램 · 카드뉴스 · 릴스</div>
+              <div style="font-size:0.8rem;color:#4ade80;font-weight:600;margin-bottom:8px;">📈 팔로워 반응 3배↑</div>
+              <div class="dc-hint">클릭해서 예시 보기 →</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-label">04 경력 리스트 — span으로 flex 버그 방지</div>
+          <div class="comp-preview">
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+              <li>
+                <span style="font-size:13px;color:#1e1e1e;">어린이 의사체험센터 '드림닥터' 인스타그램 마케팅<br />→ <strong>팔로워 83% 증가, 조회수 12만</strong></span>
+              </li>
+            </ul>
+            <div style="margin-top:12px;padding:10px;background:#fff3cd;border:1px solid #ffc107;font-size:11px;color:#856404;">
+              ⚠️ <code>&lt;li&gt;</code>가 <code>display:flex</code>일 때 <code>&lt;strong&gt;</code>이 flex item으로 분리되는 버그 → <code>&lt;span&gt;</code>으로 반드시 감쌀 것
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       07 — AI 플레이그라운드
+  ══════════════════════════════════════ -->
+  <section id="s7" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">07</span> AI Playground — Vercel Serverless</div>
+      <h2 class="sec-title">AI<br />플레이그라운드</h2>
+      <p class="sec-desc">API 키를 서버 사이드에 숨기고 클라이언트는 <code>/api/query</code>만 호출합니다. 키 prefix로 Anthropic/OpenAI를 자동 판별합니다.</p>
+      <div style="display:flex;gap:2px;margin-bottom:32px;" class="fade-up">
+        <div style="background:#111;padding:24px 28px;flex:1;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.4);margin-bottom:16px;text-transform:uppercase;">동작 흐름</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="background:#1e293b;color:#7dd3fc;font-size:11px;font-weight:700;padding:4px 10px;flex-shrink:0;">01</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.6);">사용자가 마케팅 상황 입력</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="background:#1e293b;color:#7dd3fc;font-size:11px;font-weight:700;padding:4px 10px;flex-shrink:0;">02</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.6);"><code style="color:#86efac;">POST /api/query</code> 호출</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="background:#1e293b;color:#7dd3fc;font-size:11px;font-weight:700;padding:4px 10px;flex-shrink:0;">03</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.6);">Anthropic or OpenAI API 요청 (키 prefix 자동 판별)</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="background:#1e293b;color:#7dd3fc;font-size:11px;font-weight:700;padding:4px 10px;flex-shrink:0;">04</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.6);">마크다운 렌더링 후 화면 표시</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;" class="fade-up">
+        <div class="code-block" style="margin:0;">
+          <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">API 키 판별 로직</span></div>
+          <div class="code-body"><pre><span class="cm">// sk- 시작이면 OpenAI,</span>
+<span class="cm">// sk-ant- 시작이면 Anthropic</span>
+<span class="kw">const</span> isOpenAI = effectiveKey
+  .<span class="hl">startsWith</span>(<span class="str">'sk-'</span>)
+  && !effectiveKey
+  .<span class="hl">startsWith</span>(<span class="str">'sk-ant-'</span>);</pre></div>
+        </div>
+        <div class="code-block" style="margin:0;">
+          <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">마크다운 렌더링</span></div>
+          <div class="code-body"><pre><span class="kw">function</span> <span class="hl">renderMarkdown</span>(text) {
+  <span class="kw">return</span> text
+    .<span class="hl">replace</span>(<span class="str">/&/g</span>, <span class="str">'&amp;amp;'</span>)
+    .<span class="hl">replace</span>(<span class="str">/</span>&lt;<span class="str">/g</span>, <span class="str">'&amp;lt;'</span>)
+    .<span class="hl">replace</span>(<span class="str">/\*\*(.+?)\*\*/g</span>,
+      <span class="str">'&lt;strong&gt;$1&lt;/strong&gt;'</span>)
+    .<span class="hl">replace</span>(<span class="str">/\n/g</span>, <span class="str">'&lt;br&gt;'</span>);
+}</pre></div>
+        </div>
+      </div>
+      <div class="md-demo fade-up" style="margin-top:2px;">
+        <div class="md-panel input">
+          <div class="md-panel-label">Raw 입력</div>
+          <div class="md-raw">**핵심 포인트** 3가지:<br />1. *역할*을 먼저 설정<br />2. 조건을 구체적으로<br />3. 출력 형식 지정</div>
+        </div>
+        <div class="md-panel output">
+          <div class="md-panel-label">렌더링 결과</div>
+          <div class="md-rendered"><strong>핵심 포인트</strong> 3가지:<br />1. <em>역할</em>을 먼저 설정<br />2. 조건을 구체적으로<br />3. 출력 형식 지정</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       08 — 다크/라이트 모드 토글
+  ══════════════════════════════════════ -->
+  <section id="s8" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">08</span> Dark / Light Mode Toggle</div>
+      <h2 class="sec-title">다크/라이트<br />모드 토글</h2>
+      <p class="sec-desc"><code>localStorage</code>에 테마를 저장해 새로고침 후에도 유지합니다. <code>data-theme</code> 속성 변경으로 CSS 변수 전체를 한번에 교체합니다.</p>
+      <div class="code-block fade-up">
+        <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">theme-toggle.js</span></div>
+        <div class="code-body"><pre><span class="cm">// 초기 로드 — 저장값 없으면 dark 기본</span>
+<span class="kw">const</span> saved = localStorage.<span class="hl">getItem</span>(<span class="str">'theme'</span>) || <span class="str">'dark'</span>;
+document.documentElement
+  .<span class="hl">setAttribute</span>(<span class="str">'data-theme'</span>, saved);
+
+<span class="cm">// 토글 버튼</span>
+themeToggle.<span class="hl">addEventListener</span>(<span class="str">'click'</span>, () => {
+  <span class="kw">const</span> current = document.documentElement
+    .<span class="hl">getAttribute</span>(<span class="str">'data-theme'</span>);
+  <span class="kw">const</span> next = current === <span class="str">'dark'</span>
+    ? <span class="str">'light'</span> : <span class="str">'dark'</span>;
+  document.documentElement
+    .<span class="hl">setAttribute</span>(<span class="str">'data-theme'</span>, next);
+  localStorage.<span class="hl">setItem</span>(<span class="str">'theme'</span>, next);
+});</pre></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       09 — 로고 가시성
+  ══════════════════════════════════════ -->
+  <section id="s9" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">09</span> Logo Visibility</div>
+      <h2 class="sec-title">로고<br />가시성</h2>
+      <p class="sec-desc">투명 배경 PNG 로고를 어떤 배경 위에서도 보이게 하려면 <code>drop-shadow</code> 필터를 겹쳐 외곽선을 그립니다.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:32px;" class="fade-up">
+        <div style="background:#fff;border:1px solid var(--border);padding:32px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray-body);">필터 없음</div>
+          <img src="assets/sanghun-ax-logo-header.png" alt="logo" style="height:40px;width:auto;" />
+          <div style="font-size:12px;color:var(--gray-body);">흰 배경에서 보임</div>
+        </div>
+        <div style="background:#1e1e1e;padding:32px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);">drop-shadow 적용</div>
+          <img src="assets/sanghun-ax-logo-header.png" alt="logo" style="height:40px;width:auto;filter:drop-shadow(0 0 1px rgba(26,26,46,0.9)) drop-shadow(0 0 1px rgba(26,26,46,0.6));" />
+          <div style="font-size:12px;color:rgba(255,255,255,.4);">어두운 배경에서도 보임</div>
+        </div>
+      </div>
+      <div class="code-block fade-up">
+        <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">logo-visibility.css</span></div>
+        <div class="code-body"><pre><span class="sel">.logo-img</span> {
+  filter:
+    <span class="hl">drop-shadow</span>(<span class="num">0</span> <span class="num">0</span> <span class="num">1px</span> rgba(<span class="num">26</span>,<span class="num">26</span>,<span class="num">46</span>,<span class="num">0.9</span>))
+    <span class="hl">drop-shadow</span>(<span class="num">0</span> <span class="num">0</span> <span class="num">1px</span> rgba(<span class="num">26</span>,<span class="num">26</span>,<span class="num">46</span>,<span class="num">0.6</span>));
+}</pre></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       10 — 모달 시스템
+  ══════════════════════════════════════ -->
+  <section id="s10" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">10</span> Modal System</div>
+      <h2 class="sec-title">모달<br />시스템</h2>
+      <p class="sec-desc">커스텀 드롭다운, 웨이브 헤더, 진행률 기반 약관 동의 — 세 가지 핵심 패턴을 직접 눌러보세요.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;" class="fade-up">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray-body);margin-bottom:16px;">수강신청 모달 데모</div>
+          <div class="modal-trigger-area">
+            <p style="font-size:13px;color:var(--gray-body);margin-bottom:20px;">버튼 클릭 → 모달 오픈</p>
+            <button class="btn-demo" onclick="openDemoModal()">모달 열기</button>
+          </div>
+          <div style="margin-top:16px;font-size:12px;color:var(--gray-body);line-height:1.8;">
+            ✓ 웨이브 헤더 (<code>::after</code> + <code>z-index:0</code>)<br />
+            ✓ 커스텀 드롭다운 (OS 기본 select 대체)<br />
+            ✓ 재열 시 폼 완전 초기화<br />
+            ✓ inline 에러 대신 <code>.form-error</code> 클래스
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray-body);margin-bottom:16px;">커스텀 셀렉트 — div 기반</div>
+          <div class="custom-select-wrap">
+            <div class="custom-select-display" id="customSelectDisplay" onclick="toggleCustomSelect()">
+              <span id="customSelectValue">선택해주세요</span>
+              <span>▾</span>
+            </div>
+            <div class="custom-select-dropdown" id="customSelectDropdown">
+              <div class="custom-select-option" onclick="selectOption('개인 수강 문의')">개인 수강 문의</div>
+              <div class="custom-select-option" onclick="selectOption('기업 교육 문의')">기업 교육 문의</div>
+              <div class="custom-select-option" onclick="selectOption('강연 섭외')">강연 섭외</div>
+              <div class="custom-select-option" onclick="selectOption('AX 컨설팅')">AX 컨설팅</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;font-size:12px;color:var(--gray-body);line-height:1.8;">
+            OS 기본 <code>select</code>는 z-index 제어 불가<br />→ div 기반 커스텀으로 교체
+          </div>
+          <div class="code-block" style="margin-top:16px;">
+            <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">약관 진행률 패턴</span></div>
+            <div class="code-body" style="font-size:11px;"><pre><span class="cm">// 조 3개마다 구간 동의 버튼</span>
+<span class="kw">const</span> total  = body.<span class="hl">querySelectorAll</span>(
+  <span class="str">'.terms-section-agree'</span>).length;
+<span class="kw">const</span> agreed = body.<span class="hl">querySelectorAll</span>(
+  <span class="str">'.terms-section-agree.agreed'</span>).length;
+prog.style.width =
+  (agreed / total * <span class="num">100</span>) + <span class="str">'%'</span>;</pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       11 — FAQ 더 보기 패턴
+  ══════════════════════════════════════ -->
+  <section id="s11" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">11</span> FAQ — Show More Pattern</div>
+      <h2 class="sec-title">FAQ<br />더 보기 패턴</h2>
+      <p class="sec-desc">아코디언 + 더 보기 버튼 두 가지 패턴을 결합합니다. 4번째 항목부터 숨기고 버튼으로 토글합니다.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;" class="fade-up">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray-body);margin-bottom:16px;">아코디언 데모</div>
+          <div class="faq-demo-item" id="faq-d1">
+            <div class="faq-demo-q" onclick="toggleFaq('faq-d1')">
+              <span>AI를 전혀 몰라도 되나요?</span>
+              <div class="faq-demo-toggle">+</div>
+            </div>
+            <div class="faq-demo-a">네, 괜찮습니다. 비전공자 입문 과정은 ChatGPT 가입부터 함께 시작합니다.</div>
+          </div>
+          <div class="faq-demo-item" id="faq-d2">
+            <div class="faq-demo-q" onclick="toggleFaq('faq-d2')">
+              <span>온라인으로 진행되나요?</span>
+              <div class="faq-demo-toggle">+</div>
+            </div>
+            <div class="faq-demo-a">개인 수강은 온라인(Zoom)으로 진행됩니다. 기업 교육은 방문 출강도 가능합니다.</div>
+          </div>
+          <div class="faq-demo-item" id="faq-d3" style="display:none;">
+            <div class="faq-demo-q" onclick="toggleFaq('faq-d3')">
+              <span>숨겨진 FAQ (더 보기 클릭 후 노출)</span>
+              <div class="faq-demo-toggle">+</div>
+            </div>
+            <div class="faq-demo-a">더 보기 버튼을 누르면 이 항목이 나타납니다.</div>
+          </div>
+          <button class="faq-more-btn-demo" id="faq-more-demo" onclick="toggleFaqMore()">
+            더 보기 <span id="faq-more-icon-demo">▾</span>
+          </button>
+        </div>
+        <div>
+          <div class="code-block" style="height:100%;">
+            <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">faq-more.js</span></div>
+            <div class="code-body"><pre><span class="cm">/* CSS */</span>
+<span class="sel">.faq-item.faq-hidden</span> {
+  display: <span class="str">none</span>;
+}
+
+<span class="cm">/* JS */</span>
+<span class="kw">let</span> faqExpanded = <span class="str">false</span>;
+btn.<span class="hl">addEventListener</span>(<span class="str">'click'</span>, () => {
+  faqExpanded = !faqExpanded;
+  hiddenItems.<span class="hl">forEach</span>(item => {
+    item.style.display =
+      faqExpanded ? <span class="str">'block'</span> : <span class="str">''</span>;
+  });
+  btn.childNodes[<span class="num">0</span>].textContent =
+    faqExpanded
+      ? <span class="str">'접기 '</span> : <span class="str">'더 보기 '</span>;
+  icon.textContent =
+    faqExpanded ? <span class="str">'▴'</span> : <span class="str">'▾'</span>;
+});</pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       12 — 푸터 & 당근 딥링크
+  ══════════════════════════════════════ -->
+  <section id="s12" class="skill-section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">12</span> Footer & Daangn Deeplink</div>
+      <h2 class="sec-title">푸터 구성<br />& 딥링크</h2>
+      <p class="sec-desc">당근마켓은 앱 전용 서비스로 웹 URL이 없습니다. <code>daangn://</code> 딥링크 + 미설치 시 스토어로 분기합니다.</p>
+      <div class="deeplink-flow fade-up" style="margin-bottom:32px;">
+        <div class="dl-step">
+          <strong>USER AGENT 확인</strong>
+          iOS / Android / 기타 판별
+        </div>
+        <div class="dl-arrow">→</div>
+        <div class="dl-step">
+          <strong>딥링크 시도</strong>
+          <code style="color:#86efac;">daangn://</code>로 앱 열기 시도
+        </div>
+        <div class="dl-arrow">→</div>
+        <div class="dl-step">
+          <strong>1.5초 후 fallback</strong>
+          미설치 시 App Store / Play Store
+        </div>
+        <div class="dl-arrow">→</div>
+        <div class="dl-step">
+          <strong>PC</strong>
+          <code style="color:#86efac;">daangn.com</code> 새 탭 오픈
+        </div>
+      </div>
+      <div class="code-block fade-up">
+        <div class="code-header"><div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div><span class="code-filename">daangn-deeplink.js</span></div>
+        <div class="code-body"><pre><span class="kw">function</span> <span class="hl">openDaangn</span>() {
+  <span class="kw">const</span> isIOS     = <span class="str">/iPhone|iPad|iPod/i</span>.<span class="hl">test</span>(navigator.userAgent);
+  <span class="kw">const</span> isAndroid = <span class="str">/Android/i</span>.<span class="hl">test</span>(navigator.userAgent);
+  <span class="kw">const</span> appStore  = <span class="str">'https://apps.apple.com/kr/app/...'</span>;
+  <span class="kw">const</span> playStore = <span class="str">'https://play.google.com/store/...'</span>;
+
+  <span class="kw">if</span> (isIOS) {
+    window.location.href = <span class="str">'daangn://'</span>;
+    <span class="hl">setTimeout</span>(() => { window.location.href = appStore; }, <span class="num">1500</span>);
+  } <span class="kw">else if</span> (isAndroid) {
+    window.location.href = <span class="str">'daangn://'</span>;
+    <span class="hl">setTimeout</span>(() => { window.location.href = playStore; }, <span class="num">1500</span>);
+  } <span class="kw">else</span> {
+    window.<span class="hl">open</span>(<span class="str">'https://www.daangn.com/'</span>, <span class="str">'_blank'</span>, <span class="str">'noopener'</span>);
+  }
+}</pre></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       13 — 트러블슈팅
+  ══════════════════════════════════════ -->
+  <section id="s13" class="skill-section" style="background:var(--black) !important;">
+    <div class="wrap">
+      <div class="sec-eyebrow" style="color:rgba(255,255,255,.4);">
+        <span class="sec-num" style="background:#333;">13</span> Troubleshooting
+      </div>
+      <h2 class="sec-title" style="color:#fff;">트러블슈팅<br />메모</h2>
+      <p class="sec-desc" style="color:rgba(255,255,255,.45);">제작 과정에서 마주친 12가지 버그와 해결 방법입니다.</p>
+      <div class="fade-up" style="overflow-x:auto;">
+        <table class="ts-table" style="--border: #333;">
+          <thead>
+            <tr>
+              <th style="border-bottom-color:#444;color:rgba(255,255,255,.35);">문제</th>
+              <th style="border-bottom-color:#444;color:rgba(255,255,255,.35);">원인</th>
+              <th style="border-bottom-color:#444;color:rgba(255,255,255,.35);">해결</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;"><code style="background:#2a1a1a;color:#f87171;">&lt;strong&gt;</code> flex 분리</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);">li에 display:flex → inline이 flex item화</td>
+              <td style="color:#4ade80;border-bottom-color:#333;"><code style="background:#1a2a1a;color:#4ade80;">&lt;span&gt;</code>으로 감싸기</td>
+            </tr>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;">다크모드 제목 불가시</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);"><code>color:var(--dark)</code>가 고정값</td>
+              <td style="color:#4ade80;border-bottom-color:#333;"><code>var(--text-heading)</code> 토큰 사용</td>
+            </tr>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;">버튼 텍스트 다크 안 보임</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);"><code>color:var(--white)</code>가 다크에서 #0F172A</td>
+              <td style="color:#4ade80;border-bottom-color:#333;"><code>color: #fff</code> 고정값 사용</td>
+            </tr>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;">한국어 단어 중간 줄바꿈</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);">CSS 기본 word-break</td>
+              <td style="color:#4ade80;border-bottom-color:#333;"><code>word-break: keep-all</code> 전역 적용</td>
+            </tr>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;">마크다운 ** 그대로 출력</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);"><code>textContent</code>로 설정</td>
+              <td style="color:#4ade80;border-bottom-color:#333;"><code>renderMarkdown()</code> 함수 적용</td>
+            </tr>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;">가격 카드 텍스트 안 보임</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);">인라인 <code>color:#fff</code> 라이트에서 그대로</td>
+              <td style="color:#4ade80;border-bottom-color:#333;"><code>.price-tier:not(.featured) p { color: var(--gray-700) !important }</code></td>
+            </tr>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;">모달 부제목 웨이브에 가림</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);">::after 웨이브가 텍스트 위에 렌더링</td>
+              <td style="color:#4ade80;border-bottom-color:#333;">::after에 <code>z-index:0</code>, 헤더 <code>padding-bottom:48px</code></td>
+            </tr>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;">OS select 모달 밖으로</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);">브라우저 네이티브 UI는 z-index 불가</td>
+              <td style="color:#4ade80;border-bottom-color:#333;">커스텀 div 드롭다운으로 교체</td>
+            </tr>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;">수강신청 재열 시 내용 남음</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);">openModal()에서 폼 초기화 안 함</td>
+              <td style="color:#4ade80;border-bottom-color:#333;">openModal()에 value/classList 초기화 추가</td>
+            </tr>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;">eyebrow 다크 대비 부족</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);">#4F46E5 on #1E293B = 2.7:1</td>
+              <td style="color:#4ade80;border-bottom-color:#333;"><code>[data-theme="dark"] .eyebrow { color: #a5b4fc }</code></td>
+            </tr>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;">당근 링크 웹 없음</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);">당근은 앱 전용 서비스</td>
+              <td style="color:#4ade80;border-bottom-color:#333;"><code>daangn://</code> 딥링크 + 미설치 시 스토어</td>
+            </tr>
+            <tr>
+              <td style="color:#f87171;border-bottom-color:#333;">데모 카드 라이트 안 보임</td>
+              <td style="border-bottom-color:#333;color:rgba(255,255,255,.4);">인라인 <code>color:#fff</code> 고정</td>
+              <td style="color:#4ade80;border-bottom-color:#333;"><code>.dc-title</code>, <code>.dc-sub</code>, <code>.dc-hint</code> 클래스로 교체</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ FOOTER ══ -->
+  <footer id="foot">
+    <div class="wrap">
+      <div class="foot-left">바이브 코딩 2025 — Skill Reference</div>
+      <div class="foot-right">
+        <img src="assets/sanghun-ax-logo-generated.png" alt="sanghun ax" style="height:32px;width:auto;opacity:.5;filter:brightness(10);display:block;margin-bottom:6px;margin-left:auto;" />
+        © 2026 최상훈. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ══ MODAL ══ -->
+  <div class="modal-overlay" id="demoModal" onclick="if(event.target===this)closeDemoModal()">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div class="modal-head-title">수강 신청</div>
+        <div class="modal-head-sub">웨이브 헤더 + 커스텀 셀렉트 데모</div>
+      </div>
+      <div class="modal-body">
+        <div class="modal-form-group">
+          <label>이름 *</label>
+          <input type="text" placeholder="홍길동" id="modalName" />
+        </div>
+        <div class="modal-form-group">
+          <label>문의 유형</label>
+          <div class="custom-select-wrap" style="width:100%;">
+            <div class="custom-select-display" id="modalSelectDisplay" onclick="toggleModalSelect()" style="width:100%;">
+              <span id="modalSelectValue">선택해주세요</span>
+              <span>▾</span>
+            </div>
+            <div class="custom-select-dropdown" id="modalSelectDropdown">
+              <div class="custom-select-option" onclick="selectModalOption('개인 수강 문의')">개인 수강 문의</div>
+              <div class="custom-select-option" onclick="selectModalOption('기업 교육 문의')">기업 교육 문의</div>
+              <div class="custom-select-option" onclick="selectModalOption('강연 섭외')">강연 섭외</div>
+            </div>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="closeDemoModal()">닫기</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    /* ── Progress bar ── */
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      const total    = document.documentElement.scrollHeight - window.innerHeight;
+      document.getElementById('progress-fill').style.width = (scrolled / total * 100) + '%';
+
+      const scrollTop = document.getElementById('scroll-top');
+      scrollTop.classList.toggle('show', scrolled > 300);
+    });
+    document.getElementById('scroll-top').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    /* ── Fade-up observer ── */
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    /* ── Modal ── */
+    function openDemoModal() {
+      document.getElementById('demoModal').classList.add('open');
+      document.getElementById('modalName').value = '';
+      document.getElementById('modalSelectValue').textContent = '선택해주세요';
+    }
+    function closeDemoModal() {
+      document.getElementById('demoModal').classList.remove('open');
+    }
+
+    /* ── Custom select (section 10) ── */
+    function toggleCustomSelect() {
+      document.getElementById('customSelectDisplay').classList.toggle('open');
+      document.getElementById('customSelectDropdown').classList.toggle('open');
+    }
+    function selectOption(val) {
+      document.getElementById('customSelectValue').textContent = val;
+      document.getElementById('customSelectDisplay').classList.remove('open');
+      document.getElementById('customSelectDropdown').classList.remove('open');
+    }
+
+    /* ── Custom select (modal) ── */
+    function toggleModalSelect() {
+      document.getElementById('modalSelectDisplay').classList.toggle('open');
+      document.getElementById('modalSelectDropdown').classList.toggle('open');
+    }
+    function selectModalOption(val) {
+      document.getElementById('modalSelectValue').textContent = val;
+      document.getElementById('modalSelectDisplay').classList.remove('open');
+      document.getElementById('modalSelectDropdown').classList.remove('open');
+    }
+
+    /* ── FAQ accordion ── */
+    function toggleFaq(id) {
+      const item = document.getElementById(id);
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-demo-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+
+    /* ── FAQ more ── */
+    let faqExpanded = false;
+    function toggleFaqMore() {
+      faqExpanded = !faqExpanded;
+      const hidden = document.getElementById('faq-d3');
+      hidden.style.display = faqExpanded ? 'block' : 'none';
+      const btn = document.getElementById('faq-more-demo');
+      btn.childNodes[0].textContent = faqExpanded ? '접기 ' : '더 보기 ';
+      document.getElementById('faq-more-icon-demo').textContent = faqExpanded ? '▴' : '▾';
+    }
+
+    /* ── Close dropdowns on outside click ── */
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.custom-select-wrap')) {
+        document.querySelectorAll('.custom-select-display').forEach(d => d.classList.remove('open'));
+        document.querySelectorAll('.custom-select-dropdown').forEach(d => d.classList.remove('open'));
+      }
+    });
+  </script>
+</body>
+</html>
