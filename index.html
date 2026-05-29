@@ -31,8 +31,30 @@
       --border:     #e0e0e0;
       --max-w:      1120px;
       --accent:     #4f46e5;
+      --accent-hover:#4338ca;
+      --accent-soft:#eef2ff;
+      --glow:       rgba(79,70,229,0.25);
       --green:      #16a34a;
     }
+
+    /* ─── 밝은 브라운톤 테마 ─── */
+    :root[data-theme="brown"] {
+      --black:      #4a3526;   /* 다크 섹션·헤딩·버튼 → 딥 코코아 브라운 */
+      --white:      #fbf6ef;   /* 배경/서피스 → 따뜻한 아이보리 */
+      --gray-body:  #8c7a68;   /* 본문/보조 → 토프 */
+      --gray-light: #f2e9dd;   /* 연한 섹션 배경 → 베이지 */
+      --border:     #e4d7c5;   /* 테두리 → 웜 탄 */
+      --accent:     #b07d4f;   /* 강조 → 캐러멜 브라운 */
+      --accent-hover:#94663c;
+      --accent-soft:#f3e7d8;   /* 연한 강조 배경 → 라이트 샌드 */
+      --glow:       rgba(176,125,79,0.28);
+    }
+    /* 브라운 테마 미세 보정 */
+    :root[data-theme="brown"] body { background: var(--white); }
+    :root[data-theme="brown"] #topnav { background: rgba(251,246,239,0.96); }
+    :root[data-theme="brown"] .code-body,
+    :root[data-theme="brown"] .code-header { background: #2e241c; }
+    :root[data-theme="brown"] .proposal-code { background: #2e241c; }
 
     .wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 40px; }
 
@@ -53,7 +75,7 @@
     .btn-white { background: #fff; color: var(--black); }
     .btn-white:hover { background: #eee; }
     .btn-accent { background: var(--accent); color: #fff; }
-    .btn-accent:hover { background: #4338ca; }
+    .btn-accent:hover { background: var(--accent-hover); }
 
     /* ══ TOP NAV ══ */
     #topnav {
@@ -80,6 +102,30 @@
     }
     .nav-links a:hover { opacity: .5; }
     .nav-actions { display: flex; gap: 10px; align-items: center; }
+    /* 테마 메뉴 */
+    .theme-menu { position: relative; }
+    .theme-btn {
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      color: var(--black); background: transparent;
+      border: 1px solid var(--border); padding: 6px 12px; cursor: pointer;
+    }
+    .theme-btn:hover { border-color: var(--black); }
+    .theme-dropdown {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      background: var(--white); border: 1px solid var(--border);
+      min-width: 180px; box-shadow: 0 8px 30px rgba(0,0,0,.12); z-index: 210;
+    }
+    .theme-dropdown.open { display: block; }
+    .theme-opt {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px; font-size: 12px; font-weight: 700;
+      color: var(--black); cursor: pointer; border-bottom: 1px solid var(--border);
+    }
+    .theme-opt:last-child { border-bottom: none; }
+    .theme-opt:hover { background: var(--gray-light); }
+    .theme-opt.active { background: var(--accent-soft); }
+    .theme-opt.active::after { content: '✓'; margin-left: auto; color: var(--accent); }
+    .theme-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,.1); }
     .nav-login {
       font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
       text-transform: uppercase; color: var(--black); cursor: pointer;
@@ -109,7 +155,7 @@
     #hero::after {
       content: ''; position: absolute; top: -40%; right: -10%;
       width: 600px; height: 600px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(79,70,229,0.25), transparent 70%);
+      background: radial-gradient(circle, var(--glow), transparent 70%);
     }
     .hero-label {
       font-size: 11px; font-weight: 700; letter-spacing: 3px;
@@ -322,7 +368,7 @@
       font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
       border: none; cursor: pointer;
     }
-    .modal-btn:hover { background: #4338ca; }
+    .modal-btn:hover { background: var(--accent-hover); }
     .modal-btn.secondary { background: transparent; color: var(--black); border: 1.5px solid var(--border); margin-top: 8px; }
     .modal-btn.secondary:hover { border-color: var(--black); background: var(--gray-light); }
     .modal-switch { text-align: center; font-size: 12px; color: var(--gray-body); margin-top: 18px; }
@@ -334,7 +380,7 @@
       display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: border-color .2s, background .2s;
     }
     .course-option:hover { border-color: var(--accent); }
-    .course-option.selected { border-color: var(--accent); background: #eef2ff; }
+    .course-option.selected { border-color: var(--accent); background: var(--accent-soft); }
     .course-option-info h5 { font-size: 14px; color: var(--black); font-weight: 700; margin-bottom: 2px; }
     .course-option-info span { font-size: 11px; color: var(--gray-body); }
     .course-option-price { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--accent); letter-spacing: 1px; flex-shrink: 0; }
@@ -436,6 +482,13 @@
         <a href="#faq">FAQ</a>
       </div>
       <div class="nav-actions">
+        <div class="theme-menu">
+          <button class="theme-btn" id="themeBtn" onclick="toggleThemeMenu(event)">🎨 테마 ▾</button>
+          <div class="theme-dropdown" id="themeDropdown">
+            <div class="theme-opt" data-theme-opt="default" onclick="setTheme('default')"><span class="theme-dot" style="background:#4f46e5"></span>기본 · 인디고</div>
+            <div class="theme-opt" data-theme-opt="brown" onclick="setTheme('brown')"><span class="theme-dot" style="background:#b07d4f"></span>브라운 · 라이트</div>
+          </div>
+        </div>
         <span class="nav-login" onclick="openAuth('login')">로그인</span>
         <button class="nav-signup" onclick="openAuth('signup')">회원가입</button>
         <div id="nav-user">
@@ -845,7 +898,7 @@
 
         <!-- STEP: GUEST QUICK PURCHASE -->
         <div class="modal-step" id="step-guest">
-          <div style="background:#eef2ff;border:1px solid #c7d2fe;padding:12px 14px;font-size:12px;color:#4338ca;line-height:1.7;margin-bottom:18px;">
+          <div style="background:var(--accent-soft);border:1px solid var(--border);padding:12px 14px;font-size:12px;color:var(--accent);line-height:1.7;margin-bottom:18px;">
             ⚡ <strong>빠른 구매</strong> — 이메일 없이 이름과 임시 비밀번호만으로 바로 구매합니다. (테스트용)
           </div>
           <div class="form-group">
@@ -1392,7 +1445,25 @@
     function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); }
 
     /* ───────── ESC to close ───────── */
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeThemeMenu(); } });
+
+    /* ───────── Theme switcher ───────── */
+    function applyTheme(t) {
+      if (t === 'brown') document.documentElement.setAttribute('data-theme', 'brown');
+      else document.documentElement.removeAttribute('data-theme');
+      document.querySelectorAll('.theme-opt').forEach(o =>
+        o.classList.toggle('active', o.dataset.themeOpt === (t || 'default')));
+    }
+    function setTheme(t) {
+      applyTheme(t);
+      localStorage.setItem('cx_theme', t);
+      closeThemeMenu();
+      toast(t === 'brown' ? '브라운 테마로 전환했습니다' : '기본 테마로 전환했습니다');
+    }
+    function toggleThemeMenu(e) { if (e) e.stopPropagation(); document.getElementById('themeDropdown').classList.toggle('open'); }
+    function closeThemeMenu() { document.getElementById('themeDropdown').classList.remove('open'); }
+    document.addEventListener('click', e => { if (!e.target.closest('.theme-menu')) closeThemeMenu(); });
+    applyTheme(localStorage.getItem('cx_theme') || 'default');
 
     /* init */
     if (SB_CONFIGURED) {
