@@ -862,12 +862,20 @@
        값을 채우기 전까지는 자동으로 "데모 모드"(localStorage)로 동작합니다.
        설정 가이드: SUPABASE_SETUP.md 참고
     ═══════════════════════════════════════════════════════════ */
-    const SUPABASE_URL      = 'YOUR_SUPABASE_URL';        // 예: https://abcd.supabase.co
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';   // 예: eyJhbGciOi...
+    const SUPABASE_URL      = 'https://jjmxprpeheuqvkrcfjec.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqbXhwcnBlaGV1cXZrcmNmamVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwMzg4OTIsImV4cCI6MjA5NTYxNDg5Mn0.Klxjus9WzL6MS25umvKDwAr3Hk7SJClApUthRQgIMWs';
 
     const SB_CONFIGURED = SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 30;
     const sb = SB_CONFIGURED && window.supabase
-      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            // 일부 샌드박스/웹뷰 환경에서 Web Locks(navigator.locks)가 멈추는 것을 방지 (락 통과 처리)
+            lock: async (_name, _acquireTimeout, fn) => await fn(),
+          },
+        })
       : null;
 
     /* ───────── Course data ───────── */
@@ -900,10 +908,19 @@
     async function refreshNav() {
       let u = null;
       if (SB_CONFIGURED) {
-        const { data } = await sb.auth.getUser();
-        if (data && data.user) {
-          const meta = data.user.user_metadata || {};
-          u = { name: meta.name || data.user.email.split('@')[0], email: data.user.email, phone: meta.phone || '' };
+        try {
+          // 세션 복원. 일부 환경(샌드박스 iframe 등)에서 멈추지 않도록 타임아웃 안전장치
+          const withTimeout = (p, ms) => Promise.race([
+            p, new Promise((_, rej) => setTimeout(() => rej(new Error('session-timeout')), ms))
+          ]);
+          const { data } = await withTimeout(sb.auth.getSession(), 4000);
+          const su = data && data.session ? data.session.user : null;
+          if (su) {
+            const meta = su.user_metadata || {};
+            u = { name: meta.name || su.email.split('@')[0], email: su.email, phone: meta.phone || '' };
+          }
+        } catch (e) {
+          console.warn('[course] 세션 복원 지연/실패 — 로그아웃 상태로 표시합니다:', e.message);
         }
       } else {
         u = getDemoUser();
@@ -1121,7 +1138,8 @@
 
       if (SB_CONFIGURED) {
         if (btn) { btn.disabled = true; btn.textContent = '신청 처리 중...'; }
-        const { data: { user } } = await sb.auth.getUser();
+        const { data: sess } = await sb.auth.getSession();
+        const user = sess && sess.session ? sess.session.user : null;
         if (!user) { if (btn){btn.disabled=false;btn.textContent='신청 완료하기';} toast('세션이 만료되었습니다. 다시 로그인해주세요.'); switchAuth('login'); return; }
         const { error } = await sb.from('enrollments').insert({
           user_id: user.id, course_key: selectedCourse, course_name: c.name, price: c.price, status: 'pending'
