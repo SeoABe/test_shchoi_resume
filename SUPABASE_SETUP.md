@@ -57,6 +57,33 @@ GitHub Pages 반영 후 회원가입 → 강좌 신청이 실제 DB에 기록됩
 
 ---
 
+## 6. 관리자 페이지 + 뉴스레터 설정 (admin.html)
+강좌 외에 **회원관리 · 판매현황 · 뉴스레터 발행** 콘솔(`admin.html`)을 쓰려면 추가 스키마가 필요합니다.
+
+1. **SQL Editor** 에서 [`supabase/admin_schema.sql`](supabase/admin_schema.sql) 전체를 붙여넣고 **RUN**
+   - `profiles`(회원 프로필 + 뉴스레터 동의 + 관리자 플래그), `newsletters` 테이블 생성
+   - 신규 가입 시 프로필 자동 생성 트리거 + 기존 회원 백필
+   - 관리자 전용 RLS 정책(`is_admin()` 기반) 적용
+2. **본인 계정을 관리자로 지정** — `admin_schema.sql` 맨 아래 줄의 이메일을 본인 것으로 바꿔 실행:
+   ```sql
+   update public.profiles set is_admin = true where email = '본인이메일@example.com';
+   ```
+   > ⚠️ 먼저 해당 이메일로 **회원가입을 1회** 완료해야 profiles에 행이 생깁니다.
+3. `https://seoabe.github.io/test_shchoi_resume/admin.html` 접속 → 관리자 계정으로 로그인
+   - 관리자가 아니면 "권한 없음" 화면이 표시됩니다 (anon 키 + RLS로 보호)
+
+### 관리자 콘솔 기능
+| 메뉴 | 내용 |
+|---|---|
+| 판매 현황 | 누적 매출·신청 건수·회원 수·구독자 수 KPI, 강좌별 신청 현황, 최근 신청 내역 |
+| 회원 관리 | 전체 회원 목록(이름·이메일·전화·뉴스레터 동의·신청수·가입일), 검색 |
+| 뉴스레터 | 작성·발행(기록)·임시저장, 구독자 수 집계, 구독자 이메일 복사, 발행 이력 |
+
+> 뉴스레터 **실제 이메일 자동 발송**은 Supabase Edge Function + 이메일 서비스(Resend/SendGrid) 연동이 필요합니다.
+> 현재는 발행 기록 저장 + "구독자 이메일 복사"로 메일 클라이언트에서 발송하는 방식입니다.
+
+---
+
 ## 신청 내역 확인 (강사용)
 - Supabase 대시보드 **Table Editor → enrollments** 에서 전체 신청 조회
 - 또는 SQL Editor:
