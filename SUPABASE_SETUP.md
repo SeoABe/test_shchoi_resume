@@ -1,6 +1,6 @@
-# course.html — Supabase 백엔드 연동 가이드
+# index.html (강좌 신청) — Supabase 백엔드 연동 가이드
 
-`course.html`은 **이중 모드**로 동작합니다.
+강좌 신청 페이지(`index.html`, 사이트 루트)는 **이중 모드**로 동작합니다.
 
 | 상태 | 동작 |
 |---|---|
@@ -30,14 +30,14 @@
      → 가입 후 인증 메일 발송. 페이지가 "이메일을 확인해주세요" 안내를 자동 표시합니다.
 3. **Site URL / Redirect URLs** 등록 (인증 메일 링크가 돌아올 주소):
    - `Authentication → URL Configuration → Site URL` 에
-     `https://seoabe.github.io/test_shchoi_resume/course.html` 입력
-   - 로컬 테스트도 하려면 Redirect URLs에 `http://localhost:3000/course.html` 추가
+     `https://seoabe.github.io/test_shchoi_resume/` 입력
+   - 로컬 테스트도 하려면 Redirect URLs에 `http://localhost:3000/` 추가
 
-## 4. API 키를 course.html에 입력
+## 4. API 키를 index.html에 입력
 1. **Project Settings → API** 에서 두 값 복사:
    - `Project URL`  (예: `https://abcdefgh.supabase.co`)
    - `anon` `public` key  (예: `eyJhbGciOiJIUzI1NiI...`)
-2. `course.html` 상단 `<script>` 안의 두 줄을 교체:
+2. `index.html` 상단 `<script>` 안의 두 줄을 교체:
 
 ```js
 const SUPABASE_URL      = 'https://abcdefgh.supabase.co';   // ← Project URL
@@ -49,8 +49,8 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiI...';          // ← anon public 
 
 ## 5. 배포
 ```bash
-git add course.html
-git commit -m "Connect course.html to Supabase backend"
+git add index.html
+git commit -m "Connect index.html to Supabase backend"
 git push origin main
 ```
 GitHub Pages 반영 후 회원가입 → 강좌 신청이 실제 DB에 기록됩니다.
