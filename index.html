@@ -352,6 +352,21 @@
     .confirm-total .label { color: var(--black); font-weight: 700; }
     .confirm-total .value { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: var(--accent); letter-spacing: 1px; }
 
+    /* coupon (confirm step) */
+    .coupon-box { padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .coupon-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-body); margin-bottom: 8px; display: block; }
+    .coupon-input-row { display: flex; gap: 8px; }
+    .coupon-input { flex: 1; font-family: 'Oxygen'; font-size: 14px; color: var(--black); background: var(--gray-light); border: 1px solid var(--border); padding: 10px 12px; outline: none; text-transform: uppercase; }
+    .coupon-input:focus { border-color: var(--accent); }
+    .coupon-apply { background: var(--black); color: #fff; border: none; font-size: 12px; font-weight: 700; letter-spacing: 1px; padding: 0 18px; cursor: pointer; }
+    .coupon-apply:hover { background: #333; }
+    .coupon-msg { font-size: 12px; margin-top: 8px; min-height: 16px; }
+    .coupon-msg.ok  { color: var(--green); font-weight: 700; }
+    .coupon-msg.err { color: #dc2626; }
+    .confirm-discount { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .confirm-discount .label { color: var(--green); }
+    .confirm-discount .value { color: var(--green); font-weight: 700; }
+
     /* success step */
     .success-icon {
       width: 72px; height: 72px; border-radius: 50%; background: var(--green); color: #fff;
@@ -860,6 +875,18 @@
           <div class="confirm-row"><span class="label">이메일</span><span class="value" id="cfEmail">—</span></div>
           <div class="confirm-row"><span class="label">강좌</span><span class="value" id="cfCourse">—</span></div>
           <div class="confirm-row"><span class="label">기간</span><span class="value" id="cfDuration">—</span></div>
+          <div class="coupon-box" id="couponBox">
+            <span class="coupon-label">쿠폰 코드</span>
+            <div class="coupon-input-row">
+              <input type="text" class="coupon-input" id="couponInput" placeholder="예: 50%, 30%, 50000WON" />
+              <button class="coupon-apply" id="couponApplyBtn" onclick="applyCoupon()">적용</button>
+            </div>
+            <div class="coupon-msg" id="couponMsg"></div>
+          </div>
+          <div class="confirm-discount" id="confirmDiscountRow" style="display:none;">
+            <span class="label" id="cfDiscountLabel">쿠폰 할인</span>
+            <span class="value" id="cfDiscount">—</span>
+          </div>
           <div class="confirm-total"><span class="label">결제 예정 금액</span><span class="value" id="cfPrice">—</span></div>
           <p style="font-size:11px;color:var(--gray-body);margin:12px 0 18px;line-height:1.7;">신청 완료 후 가입 이메일로 결제 링크와 수강 안내가 발송됩니다. 실제 결제는 발생하지 않는 데모입니다.</p>
           <button class="modal-btn" onclick="doEnroll()">신청 완료하기</button>
@@ -1185,6 +1212,39 @@
       });
     }
 
+    /* ───────── Coupon state ───────── */
+    let appliedCoupon = null;  // { code, discount_type, discount_value, discountAmount, remaining }
+
+    function discountFor(course, coupon) {
+      if (!coupon || !course.price) return 0;
+      const d = coupon.discount_type === 'percent'
+        ? Math.floor(course.price * coupon.discount_value / 100)
+        : coupon.discount_value;
+      return Math.min(d, course.price); // 가격 초과 할인 방지
+    }
+
+    function renderConfirmPrice() {
+      const c = COURSES[selectedCourse];
+      const discRow = document.getElementById('confirmDiscountRow');
+      if (!c.price) { // 견적(기업) — 쿠폰/금액 없음
+        document.getElementById('cfPrice').textContent = '견적 문의';
+        discRow.style.display = 'none';
+        return;
+      }
+      const disc = discountFor(c, appliedCoupon);
+      if (disc > 0) {
+        const label = appliedCoupon.discount_type === 'percent'
+          ? `쿠폰 할인 (${appliedCoupon.code} · ${appliedCoupon.discount_value}%)`
+          : `쿠폰 할인 (${appliedCoupon.code})`;
+        document.getElementById('cfDiscountLabel').textContent = label;
+        document.getElementById('cfDiscount').textContent = '- ' + won(disc);
+        discRow.style.display = 'flex';
+      } else {
+        discRow.style.display = 'none';
+      }
+      document.getElementById('cfPrice').textContent = won(c.price - disc);
+    }
+
     function goConfirm() {
       if (!selectedCourse) { document.getElementById('selectError').textContent = '강좌를 선택해주세요.'; return; }
       const u = currentUser; const c = COURSES[selectedCourse];
@@ -1192,39 +1252,102 @@
       document.getElementById('cfEmail').textContent = u.email;
       document.getElementById('cfCourse').textContent = c.name;
       document.getElementById('cfDuration').textContent = c.duration;
-      document.getElementById('cfPrice').textContent = c.price ? won(c.price) : '견적 문의';
+      // 쿠폰 초기화
+      appliedCoupon = null;
+      document.getElementById('couponInput').value = '';
+      document.getElementById('couponMsg').textContent = '';
+      document.getElementById('couponMsg').className = 'coupon-msg';
+      document.getElementById('couponBox').style.display = c.price ? 'block' : 'none';
+      renderConfirmPrice();
       goStep('confirm');
       document.getElementById('modalTitle').textContent = '신청 확인';
       document.getElementById('modalSub').textContent = '내용을 확인하고 신청하세요';
     }
 
+    async function applyCoupon() {
+      const code = document.getElementById('couponInput').value.trim();
+      const msg  = document.getElementById('couponMsg');
+      const btn  = document.getElementById('couponApplyBtn');
+      const c = COURSES[selectedCourse];
+      if (!code) { msg.className = 'coupon-msg err'; msg.textContent = '쿠폰 코드를 입력해주세요.'; return; }
+
+      if (!SB_CONFIGURED) { // 데모 모드: 50% / 30% / 50000WON 간이 처리
+        const up = code.toUpperCase();
+        let cp = null;
+        if (up === '50%') cp = { code: up, discount_type: 'percent', discount_value: 50, remaining: 99 };
+        else if (up === '30%') cp = { code: up, discount_type: 'percent', discount_value: 30, remaining: 99 };
+        else if (up === '50000WON') cp = { code: up, discount_type: 'amount', discount_value: 50000, remaining: 99 };
+        if (!cp) { msg.className='coupon-msg err'; msg.textContent='유효하지 않은 쿠폰입니다.'; appliedCoupon=null; renderConfirmPrice(); return; }
+        appliedCoupon = cp; finishApply(cp, c, msg); return;
+      }
+
+      btn.disabled = true; btn.textContent = '확인';
+      const { data, error } = await sb.rpc('validate_coupon', { p_code: code });
+      btn.disabled = false; btn.textContent = '적용';
+      if (error) { msg.className='coupon-msg err'; msg.textContent='쿠폰 확인 오류: ' + error.message; return; }
+      const row = data && data[0];
+      if (!row) { msg.className='coupon-msg err'; msg.textContent='유효하지 않거나 소진된 쿠폰입니다.'; appliedCoupon=null; renderConfirmPrice(); return; }
+      appliedCoupon = row;
+      finishApply(row, c, msg);
+    }
+
+    function finishApply(cp, c, msg) {
+      const disc = discountFor(c, cp);
+      const dtxt = cp.discount_type === 'percent' ? `${cp.discount_value}% 할인` : `${won(cp.discount_value)} 할인`;
+      msg.className = 'coupon-msg ok';
+      msg.textContent = `✓ ${cp.code} 적용 — ${dtxt} (${won(disc)}) · 잔여 ${cp.remaining}회`;
+      renderConfirmPrice();
+    }
+
     async function doEnroll() {
       const u = currentUser; const c = COURSES[selectedCourse];
       const btn = event && event.target;
+      let discount = 0, couponCode = null;
 
       if (SB_CONFIGURED) {
         if (btn) { btn.disabled = true; btn.textContent = '신청 처리 중...'; }
         const { data: sess } = await sb.auth.getSession();
         const user = sess && sess.session ? sess.session.user : null;
         if (!user) { if (btn){btn.disabled=false;btn.textContent='신청 완료하기';} toast('세션이 만료되었습니다. 다시 로그인해주세요.'); switchAuth('login'); return; }
+
+        // 쿠폰 사용 (원자적 차감)
+        if (appliedCoupon && c.price) {
+          const { data: rem, error: rerr } = await sb.rpc('redeem_coupon', { p_code: appliedCoupon.code });
+          if (rerr) { if (btn){btn.disabled=false;btn.textContent='신청 완료하기';} toast('쿠폰 처리 오류: ' + rerr.message); return; }
+          if (rem === null || rem < 0) {
+            if (btn){btn.disabled=false;btn.textContent='신청 완료하기';}
+            const msg = document.getElementById('couponMsg');
+            msg.className='coupon-msg err'; msg.textContent='쿠폰이 모두 소진되었습니다. 다른 쿠폰을 사용해주세요.';
+            appliedCoupon = null; renderConfirmPrice(); return;
+          }
+          discount = discountFor(c, appliedCoupon);
+          couponCode = appliedCoupon.code;
+        }
+
         const { error } = await sb.from('enrollments').insert({
-          user_id: user.id, course_key: selectedCourse, course_name: c.name, price: c.price, status: 'pending'
+          user_id: user.id, course_key: selectedCourse, course_name: c.name,
+          price: (c.price - discount), discount, coupon_code: couponCode, status: 'pending'
         });
         if (btn) { btn.disabled = false; btn.textContent = '신청 완료하기'; }
         if (error) { toast('신청 저장 실패: ' + error.message); return; }
       } else {
+        if (appliedCoupon && c.price) { discount = discountFor(c, appliedCoupon); couponCode = appliedCoupon.code; }
         const enrolls = JSON.parse(localStorage.getItem('cx_enrolls') || '[]');
-        enrolls.push({ course: selectedCourse, name: u.name, email: u.email, at: new Date().toISOString() });
+        enrolls.push({ course: selectedCourse, name: u.name, email: u.email, price: c.price - discount, discount, coupon_code: couponCode, at: new Date().toISOString() });
         localStorage.setItem('cx_enrolls', JSON.stringify(enrolls));
       }
 
+      const finalPrice = c.price - discount;
       goStep('success');
       const icon = document.querySelector('#step-success .success-icon');
       icon.textContent = '✓'; icon.style.background = 'var(--green)';
       document.querySelector('#step-success .success-title').textContent = '신청 완료!';
       document.getElementById('modalTitle').textContent = '신청 완료';
       document.getElementById('modalSub').textContent = '감사합니다';
-      const priceLine = c.price ? `결제 예정 금액 ${won(c.price)}` : '담당자가 견적과 함께 연락드립니다';
+      let priceLine;
+      if (!c.price) priceLine = '담당자가 견적과 함께 연락드립니다';
+      else if (discount > 0) priceLine = `${couponCode} 적용 · 결제 예정 금액 ${won(finalPrice)} <span style="color:var(--gray-body);">(− ${won(discount)})</span>`;
+      else priceLine = `결제 예정 금액 ${won(finalPrice)}`;
       document.getElementById('successDesc').innerHTML =
         `<strong style="color:var(--black);">${c.name}</strong> 신청이 접수되었습니다.<br />` +
         `${priceLine}<br /><span style="color:var(--gray-body);">${u.email} 로 안내를 보내드릴게요.</span>`;
