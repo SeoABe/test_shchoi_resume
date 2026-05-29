@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>최상훈 — AI Educator & AX Consultant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oxygen:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Oxygen', sans-serif; font-size: 15px; line-height: 1.7; letter-spacing: 0.9px; color: #6e777a; background: #fff; word-break: keep-all; overflow-wrap: break-word; }
+    img  { max-width: 100%; display: block; }
+    a    { color: inherit; text-decoration: none; }
+
+    /* ─── Tokens ─── */
+    :root {
+      --black:      #1e1e1e;
+      --white:      #ffffff;
+      --gray-body:  #6e777a;
+      --gray-light: #f5f5f5;
+      --border:     #e0e0e0;
+      --max-w:      1120px;
+      --sec-pad:    120px 0;
+    }
+
+    /* ─── Utilities ─── */
+    .wrap      { max-width: var(--max-w); margin: 0 auto; padding: 0 40px; }
+    .bebas     { font-family: 'Bebas Neue', sans-serif; font-weight: 400; }
+    .fade-up   { opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .6s ease; }
+    .fade-up.visible { opacity: 1; transform: none; }
+
+    /* ─── Placeholder ─── */
+    .ph {
+      background: #e8e8e8;
+      display: flex; align-items: center; justify-content: center;
+      color: #aaa; font-size: 13px; letter-spacing: 1px;
+    }
+    .ph-dark {
+      background: #2a2a2a;
+      display: flex; align-items: center; justify-content: center;
+      color: #555; font-size: 13px; letter-spacing: 1px;
+    }
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-block;
+      font-family: 'Oxygen', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 14px 32px;
+      cursor: pointer; border: none;
+    }
+    .btn-dark  { background: var(--black); color: var(--white); }
+    .btn-dark:hover { background: #333; }
+    .btn-outline-dark { background: transparent; color: var(--black); border: 1.5px solid var(--black); }
+    .btn-outline-dark:hover { background: var(--black); color: var(--white); }
+    .btn-white { background: var(--white); color: var(--black); }
+    .btn-white:hover { background: #eee; }
+    .btn-outline-white { background: transparent; color: var(--white); border: 1.5px solid var(--white); }
+    .btn-outline-white:hover { background: var(--white); color: var(--black); }
+
+    /* ─── Section Labels ─── */
+    .sec-label {
+      font-family: 'Oxygen', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 16px; display: block;
+    }
+    .sec-label-dark  { color: var(--gray-body); }
+    .sec-label-light { color: rgba(255,255,255,0.5); }
+
+
+    /* ════════════════════════════════════════
+       nav-global
+    ════════════════════════════════════════ */
+    #nav-global {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 60px;
+      background: rgba(255,255,255,0);
+      border-bottom: 1px solid transparent;
+      transition: background .3s, border-color .3s;
+    }
+    #nav-global.scrolled {
+      background: rgba(255,255,255,0.97);
+      border-bottom-color: var(--border);
+    }
+    #nav-global .wrap {
+      height: 100%; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px; letter-spacing: 3px; color: var(--black);
+    }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--black);
+    }
+    .nav-links a:hover { opacity: .5; }
+    .nav-cta {
+      font-family: 'Oxygen', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--black);
+      border: 1.5px solid var(--black);
+      padding: 8px 20px;
+    }
+    .nav-cta:hover { background: var(--black); color: var(--white); }
+    /* 햄버거 (모바일) */
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .nav-hamburger span { width: 24px; height: 2px; background: var(--black); display: block; }
+    .nav-mobile-menu {
+      display: none; position: fixed; inset: 60px 0 0 0;
+      background: var(--white); z-index: 99;
+      flex-direction: column; align-items: center; justify-content: center; gap: 32px;
+    }
+    .nav-mobile-menu.open { display: flex; }
+    .nav-mobile-menu a {
+      font-size: 13px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--black);
+    }
+
+
+    /* ════════════════════════════════════════
+       section-hero
+    ════════════════════════════════════════ */
+    #section-hero {
+      background: var(--white);
+    }
+    .hero-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 60px 40px 0;
+      display: grid; grid-template-columns: 1fr 480px;
+      overflow: hidden;
+    }
+    .hero-copy {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 40px 40px 40px 40px;
+      max-width: 640px;
+    }
+    /* 순환 증거 문구 */
+    .hero-rotating-wrap {
+      height: 32px; overflow: hidden; margin-bottom: 32px;
+    }
+    .hero-rotating {
+      font-family: 'Oxygen', sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--gray-body);
+      display: flex; flex-direction: column;
+      transition: transform .5s cubic-bezier(.4,0,.2,1);
+    }
+    .hero-rotating span { height: 32px; line-height: 32px; flex-shrink: 0; }
+
+    .hero-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 10vw, 120px);
+      line-height: 1; letter-spacing: 4px;
+      color: var(--black); margin-bottom: 8px;
+    }
+    .hero-role {
+      font-size: 13px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gray-body);
+      margin-bottom: 32px;
+    }
+    .hero-slogan {
+      font-size: 18px; color: var(--black);
+      line-height: 1.6; margin-bottom: 48px;
+      max-width: 480px;
+    }
+    .hero-slogan em { font-style: italic; }
+    .hero-actions  { display: flex; gap: 12px; flex-wrap: wrap; }
+    /* 히어로 우측 사진 */
+    .hero-photo {
+      height: 100%;
+    }
+
+
+    /* ════════════════════════════════════════
+       section-proof
+    ════════════════════════════════════════ */
+    #section-proof { background: var(--gray-light); padding: 48px 0; }
+    .proof-label {
+      text-align: center;
+      font-size: 11px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--gray-body);
+      margin-bottom: 32px;
+    }
+    .proof-logos {
+      display: flex; align-items: center;
+      justify-content: center; flex-wrap: wrap; gap: 2px;
+    }
+    .proof-logo {
+      width: 160px; height: 64px;
+      font-size: 11px; letter-spacing: 1px;
+    }
+
+
+    /* ════════════════════════════════════════
+       section-about-ax
+    ════════════════════════════════════════ */
+    #section-about-ax { background: var(--black); padding: var(--sec-pad); }
+    .ax-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .ax-left .sec-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 7vw, 88px);
+      letter-spacing: 4px; line-height: 1;
+      color: var(--white); margin-bottom: 24px;
+    }
+    .ax-left p { color: rgba(255,255,255,.55); max-width: 440px; }
+    .ax-results { display: flex; flex-direction: column; gap: 32px; padding-top: 8px; }
+    .ax-result {
+      border-top: 1px solid #333;
+      padding-top: 28px;
+    }
+    .ax-result-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px; letter-spacing: 2px;
+      color: var(--white); line-height: 1; margin-bottom: 8px;
+    }
+    .ax-result h4 {
+      font-size: 14px; font-weight: 700; letter-spacing: 1px;
+      color: var(--white); margin-bottom: 6px;
+    }
+    .ax-result p { font-size: 13px; color: rgba(255,255,255,.45); }
+
+
+    /* ════════════════════════════════════════
+       section-instructor
+    ════════════════════════════════════════ */
+    #section-instructor { background: var(--white); padding: var(--sec-pad); }
+    /* 수치 배너 */
+    .instr-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border);
+      margin-bottom: 80px;
+    }
+    .instr-stat {
+      padding: 32px 40px;
+      border-right: 1px solid var(--border);
+    }
+    .instr-stat:last-child { border-right: none; }
+    .instr-stat .num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px; letter-spacing: 2px;
+      color: var(--black); line-height: 1; margin-bottom: 6px;
+    }
+    .instr-stat .label { font-size: 12px; letter-spacing: 1px; }
+
+    /* 역할별 블록 */
+    .instr-roles { display: flex; flex-direction: column; gap: 0; }
+    .instr-role {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+      padding: 64px 0;
+      border-top: 1px solid var(--border);
+    }
+    .instr-role:last-child { border-bottom: 1px solid var(--border); }
+    .instr-role-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 5vw, 64px);
+      letter-spacing: 3px; color: var(--black); line-height: 1;
+    }
+    .instr-role-body p { margin-bottom: 16px; }
+    .instr-role-body p:last-child { margin-bottom: 0; }
+
+    /* 경력 + 태그 */
+    .instr-bottom {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; margin-top: 80px;
+      padding-top: 64px; border-top: 1px solid var(--border);
+    }
+    .instr-career h4 {
+      font-size: 11px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--gray-body);
+      margin-bottom: 24px;
+    }
+    .career-list { display: flex; flex-direction: column; gap: 16px; }
+    .career-item { display: flex; gap: 24px; }
+    .career-year { font-size: 12px; color: var(--gray-body); min-width: 80px; padding-top: 2px; }
+    .career-desc { font-size: 14px; color: var(--black); }
+    .career-award { font-size: 12px; color: var(--gray-body); margin-top: 4px; }
+
+    .instr-skills h4 {
+      font-size: 11px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--gray-body);
+      margin-bottom: 24px;
+    }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .skill-tag {
+      font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--black);
+      border: 1px solid var(--border); padding: 6px 14px;
+    }
+
+
+    /* ════════════════════════════════════════
+       section-query-intro
+    ════════════════════════════════════════ */
+    #section-query-intro { background: var(--black); padding: var(--sec-pad); }
+    .query-header { margin-bottom: 64px; }
+    .query-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 6vw, 80px);
+      letter-spacing: 4px; color: var(--white); line-height: 1;
+      margin-bottom: 16px;
+    }
+    .query-subtitle { color: rgba(255,255,255,.45); max-width: 560px; }
+    /* 비교 코드 블록 */
+    .query-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-bottom: 64px; }
+    .query-block {}
+    .query-block-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; padding: 12px 24px;
+    }
+    .query-block.bad  .query-block-label { background: #5c1a1a; color: #f87171; }
+    .query-block.good .query-block-label { background: #14372a; color: #4ade80; }
+    .query-code {
+      background: #111; padding: 28px 24px;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 13px; line-height: 1.9; color: #aaa;
+    }
+    .query-code .kw  { color: #7dd3fc; }
+    .query-code .str { color: #86efac; }
+    .query-code .cm  { color: #4b5563; }
+    .query-code .hl  { color: #fcd34d; }
+    /* 3단계 */
+    .query-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .query-step { background: #111; padding: 40px 32px; }
+    .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 56px; letter-spacing: 2px;
+      color: #2a2a2a; line-height: 1; margin-bottom: 16px;
+    }
+    .step-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px; letter-spacing: 2px;
+      color: var(--white); margin-bottom: 12px;
+    }
+    .step-desc { font-size: 13px; color: rgba(255,255,255,.4); line-height: 1.7; }
+
+
+    /* ════════════════════════════════════════
+       section-programs
+    ════════════════════════════════════════ */
+    #section-programs { background: var(--white); padding: var(--sec-pad); }
+    .prog-header { margin-bottom: 56px; }
+    .prog-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 6vw, 80px);
+      letter-spacing: 4px; color: var(--black); line-height: 1;
+      margin-bottom: 16px;
+    }
+    .prog-desc { max-width: 480px; }
+    /* 탭 */
+    .prog-tabs { display: flex; gap: 0; margin-bottom: 48px; border-bottom: 1px solid var(--border); }
+    .prog-tab {
+      font-size: 12px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gray-body);
+      padding: 14px 28px; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .prog-tab.active { color: var(--black); border-bottom-color: var(--black); }
+    .prog-panel { display: none; }
+    .prog-panel.active { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    /* 프로그램 카드 */
+    .prog-card { border: 1px solid var(--border); display: flex; flex-direction: column; }
+    .prog-card-head { padding: 32px 32px 0; }
+    .prog-card-type {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gray-body); margin-bottom: 16px;
+    }
+    .prog-card-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px; letter-spacing: 2px;
+      color: var(--black); line-height: 1.2; margin-bottom: 8px;
+    }
+    .prog-card-target { font-size: 13px; color: var(--gray-body); }
+    .prog-card-divider { height: 1px; background: var(--border); margin: 24px 0; }
+    .prog-card-results { padding: 0 32px; flex: 1; }
+    .prog-card-results h5 {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gray-body); margin-bottom: 14px;
+    }
+    .prog-card-results ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .prog-card-results li {
+      font-size: 13px; color: var(--black);
+      display: flex; gap: 10px;
+    }
+    .prog-card-results li::before { content: "→"; color: var(--gray-body); flex-shrink: 0; }
+    .prog-card-footer {
+      padding: 24px 32px; margin-top: 32px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .prog-card-duration { font-size: 12px; color: var(--gray-body); letter-spacing: 1px; }
+
+    /* 기업 담당자 키트 */
+    .corp-kit {
+      margin-top: 2px;
+      background: var(--black); padding: 40px 48px;
+      display: flex; align-items: center; justify-content: space-between; gap: 32px;
+    }
+    .corp-kit-text h4 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px; letter-spacing: 3px;
+      color: var(--white); margin-bottom: 6px;
+    }
+    .corp-kit-text p { font-size: 13px; color: rgba(255,255,255,.5); }
+    .corp-kit-actions { display: flex; gap: 12px; flex-shrink: 0; }
+
+
+    /* ════════════════════════════════════════
+       section-testimonials
+    ════════════════════════════════════════ */
+    #section-testimonials { background: var(--black); padding: var(--sec-pad); }
+    .testi-header { margin-bottom: 56px; }
+    .testi-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 6vw, 80px);
+      letter-spacing: 4px; color: var(--white); line-height: 1;
+      margin-bottom: 16px;
+    }
+    .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .testi-card { background: #111; padding: 40px 36px; display: flex; flex-direction: column; }
+    .testi-type {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: rgba(255,255,255,.3);
+      margin-bottom: 24px;
+    }
+    .testi-body {
+      font-size: 15px; color: rgba(255,255,255,.75);
+      line-height: 1.8; flex: 1; margin-bottom: 32px;
+    }
+    .testi-author { display: flex; gap: 14px; align-items: center; }
+    .testi-avatar { width: 44px; height: 44px; background: #2a2a2a; flex-shrink: 0; }
+    .testi-name  { font-size: 13px; font-weight: 700; color: var(--white); }
+    .testi-info  { font-size: 12px; color: rgba(255,255,255,.35); margin-top: 2px; }
+
+
+    /* ════════════════════════════════════════
+       section-faq
+    ════════════════════════════════════════ */
+    #section-faq { background: var(--white); padding: var(--sec-pad); }
+    .faq-layout { display: grid; grid-template-columns: 360px 1fr; gap: 80px; align-items: start; }
+    .faq-sidebar-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 5vw, 60px);
+      letter-spacing: 3px; color: var(--black); line-height: 1;
+      margin-bottom: 16px;
+    }
+    .faq-sidebar p { color: var(--gray-body); }
+    .faq-list { display: flex; flex-direction: column; }
+    .faq-item { border-top: 1px solid var(--border); }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-q {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 22px 0; cursor: pointer; gap: 16px;
+    }
+    .faq-q span { font-size: 15px; color: var(--black); font-weight: 700; }
+    .faq-toggle { font-size: 20px; color: var(--gray-body); flex-shrink: 0; line-height: 1; transition: transform .3s; }
+    .faq-item.open .faq-toggle { transform: rotate(45deg); }
+    .faq-a {
+      font-size: 14px; color: var(--gray-body); line-height: 1.8;
+      max-height: 0; overflow: hidden; transition: max-height .4s ease, padding .3s;
+    }
+    .faq-item.open .faq-a { max-height: 300px; padding-bottom: 22px; }
+
+
+    /* ════════════════════════════════════════
+       section-contact
+    ════════════════════════════════════════ */
+    #section-contact { background: var(--gray-light); padding: var(--sec-pad); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .contact-cta {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 6vw, 80px);
+      letter-spacing: 4px; color: var(--black); line-height: 1;
+      margin-bottom: 24px;
+    }
+    .contact-desc { color: var(--gray-body); margin-bottom: 48px; }
+    .contact-links { display: flex; flex-direction: column; gap: 0; }
+    .contact-link {
+      display: flex; gap: 20px; align-items: center;
+      padding: 20px 0; border-top: 1px solid var(--border);
+    }
+    .contact-link:last-child { border-bottom: 1px solid var(--border); }
+    .contact-link-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gray-body); min-width: 72px;
+    }
+    .contact-link-value { font-size: 14px; color: var(--black); font-weight: 700; }
+    /* 폼 */
+    .contact-form { background: var(--white); padding: 48px; }
+    .form-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .form-group label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gray-body);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      font-family: 'Oxygen', sans-serif; font-size: 14px;
+      color: var(--black); background: var(--gray-light);
+      border: none; border-bottom: 1.5px solid var(--border);
+      padding: 12px 0; outline: none;
+      transition: border-color .2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-bottom-color: var(--black); }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: #bbb; }
+    .form-group select { cursor: pointer; }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-privacy {
+      display: flex; gap: 10px; align-items: flex-start;
+      margin-bottom: 24px; font-size: 12px; color: var(--gray-body);
+    }
+    .form-privacy input { margin-top: 3px; accent-color: var(--black); flex-shrink: 0; }
+    .form-submit {
+      width: 100%; padding: 16px;
+      background: var(--black); color: var(--white);
+      font-family: 'Oxygen', sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; border: none; cursor: pointer;
+    }
+    .form-submit:hover { background: #333; }
+
+
+    /* ════════════════════════════════════════
+       footer-global
+    ════════════════════════════════════════ */
+    #footer-global { background: var(--black); padding: 56px 0; }
+    #footer-global .wrap {
+      display: flex; justify-content: space-between;
+      align-items: flex-end; flex-wrap: wrap; gap: 24px;
+    }
+    .footer-slogan {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px; letter-spacing: 3px;
+      color: rgba(255,255,255,.25);
+    }
+    .footer-right { text-align: right; }
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px; letter-spacing: 3px;
+      color: var(--white); margin-bottom: 8px;
+    }
+    .footer-copy { font-size: 11px; color: rgba(255,255,255,.3); letter-spacing: 1px; }
+    .footer-links { display: flex; gap: 20px; margin-top: 8px; justify-content: flex-end; }
+    .footer-links a { font-size: 11px; color: rgba(255,255,255,.3); letter-spacing: 1px; }
+    .footer-links a:hover { color: rgba(255,255,255,.6); }
+
+
+    /* ─── Responsive ─── */
+    @media (max-width: 900px) {
+      .hero-inner   { grid-template-columns: 1fr; padding: 60px 24px 0; }
+      .hero-photo   { display: none; }
+      .hero-copy    { padding: 40px 0; }
+      .proof-logo   { width: calc(50% - 1px); }
+      .ax-inner     { grid-template-columns: 1fr; gap: 48px; }
+      .instr-stats  { grid-template-columns: 1fr; }
+      .instr-stat   { border-right: none; border-bottom: 1px solid var(--border); }
+      .instr-role   { grid-template-columns: 1fr; gap: 24px; }
+      .instr-bottom { grid-template-columns: 1fr; gap: 48px; }
+      .query-compare{ grid-template-columns: 1fr; }
+      .query-steps  { grid-template-columns: 1fr; }
+      .prog-panel.active { grid-template-columns: 1fr; }
+      .testi-grid   { grid-template-columns: 1fr; }
+      .faq-layout   { grid-template-columns: 1fr; gap: 40px; }
+      .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+      .contact-form { padding: 32px 24px; }
+      .form-row     { grid-template-columns: 1fr; }
+      .corp-kit     { flex-direction: column; align-items: flex-start; }
+      .nav-links    { display: none; }
+      .nav-hamburger{ display: flex; }
+      .nav-cta      { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       nav-global
+  ══════════════════════════════════════ -->
+  <nav id="nav-global">
+    <div class="wrap">
+      <a href="#section-hero" class="nav-logo">
+        <img src="assets/sanghun-ax-logo-header.png" alt="sanghun ax" style="height:36px; width:auto; display:block;" />
+      </a>
+      <div class="nav-links">
+        <a href="#section-about-ax">AX란?</a>
+        <a href="#section-instructor">강사 소개</a>
+        <a href="#section-query-intro">쿼리란?</a>
+        <a href="#section-programs">강의 프로그램</a>
+        <a href="#section-faq">FAQ</a>
+        <a href="index.html">강좌 신청</a>
+      </div>
+      <a href="index.html" class="nav-cta">강좌 신청하기</a>
+      <div class="nav-hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 모바일 메뉴 -->
+  <div class="nav-mobile-menu" id="mobileMenu">
+    <a href="#section-about-ax"     onclick="closeMobile()">AX란?</a>
+    <a href="#section-instructor"   onclick="closeMobile()">강사 소개</a>
+    <a href="#section-query-intro"  onclick="closeMobile()">쿼리란?</a>
+    <a href="#section-programs"     onclick="closeMobile()">강의 프로그램</a>
+    <a href="#section-faq"          onclick="closeMobile()">FAQ</a>
+    <a href="index.html"            onclick="closeMobile()">강좌 신청</a>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       section-hero
+       순환 증거 문구 + 강사 이름 + 태그라인 + CTA
+  ══════════════════════════════════════ -->
+  <section id="section-hero">
+    <div class="hero-inner">
+    <div class="hero-copy">
+      <!-- 순환 증거 문구 -->
+      <div class="hero-rotating-wrap">
+        <div class="hero-rotating" id="rotatingText">
+          <span>R&D 전문 경력 10년+</span>
+          <span>기업·기관 50곳 이상과 함께</span>
+          <span>기획 기반 AI 실전 교육</span>
+        </div>
+      </div>
+
+      <h1 class="hero-name">최상훈</h1>
+      <div class="hero-role">AI Educator&nbsp;&nbsp;·&nbsp;&nbsp;AX Consultant&nbsp;&nbsp;·&nbsp;&nbsp;디지털 혁신의 러닝 파트너</div>
+      <p class="hero-slogan">
+        <em>"AI는 도구일 뿐,<br />핵심은 비즈니스 기획입니다."</em>
+      </p>
+      <div class="hero-actions">
+        <a href="#section-programs" class="btn btn-dark">강의 프로그램 보기</a>
+        <a href="#section-contact" class="btn btn-outline-dark">문의하기</a>
+      </div>
+    </div>
+
+    <img src="assets/choi-instructor-profile.png" alt="최상훈 강사" class="hero-photo" style="object-fit:cover; object-position:center 10%; width:100%; height:100%;" />
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       section-proof
+       협력 기관 로고 스트립
+  ══════════════════════════════════════ -->
+  <section id="section-proof">
+    <div class="wrap">
+      <p class="proof-label">50곳 이상의 기업·기관이 선택했습니다</p>
+      <div class="proof-logos">
+        <div class="proof-logo ph">한국철도공사</div>
+        <div class="proof-logo ph">광해공단</div>
+        <div class="proof-logo ph">보훈병원</div>
+        <div class="proof-logo ph">팩트체크넷</div>
+        <div class="proof-logo ph">문화체육관광부</div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       section-about-ax
+       AX 개념 + 결과 중심 3가지 수혜
+  ══════════════════════════════════════ -->
+  <section id="section-about-ax">
+    <div class="wrap">
+      <div class="ax-inner fade-up">
+        <div class="ax-left">
+          <span class="sec-label sec-label-light">AX란?</span>
+          <h2 class="sec-title ax-left" style="font-family:'Bebas Neue',sans-serif; font-size:clamp(56px,7vw,88px); letter-spacing:4px; line-height:1; color:#fff; margin-bottom:24px;">AI Transformation,<br />일하는 방식의<br />재설계</h2>
+          <p style="color:rgba(255,255,255,.5); max-width:400px;">
+            ChatGPT·Claude 같은 AI 도구를 업무에 내재화해 생산성·품질·의사결정을 동시에 높이는 전략입니다. 단순 자동화를 넘어, 비즈니스 프로세스 전반을 재설계합니다.
+          </p>
+        </div>
+        <div class="ax-results">
+          <div class="ax-result">
+            <div class="ax-result-num">300%</div>
+            <h4>기안서 작성 속도 단축</h4>
+            <p>반복 문서 작업을 AI에 위임하면 기획서·보고서·마케팅 카피를 3배 빠르게 완성합니다.</p>
+          </div>
+          <div class="ax-result">
+            <div class="ax-result-num">50%</div>
+            <h4>사내 프로세스 병목 제거</h4>
+            <p>리소스 낭비 포인트를 진단하고, AI 도입 프레임워크로 팀 효율을 절반의 시간으로 높입니다.</p>
+          </div>
+          <div class="ax-result">
+            <div class="ax-result-num">∞</div>
+            <h4>스스로 문제를 해결하는 팀</h4>
+            <p>강의 종료 후에도 팀이 자체적으로 AI를 확장 적용할 수 있는 기초 체력을 만들어 드립니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       section-instructor
+       역할별 H1 + 경력 + 역량
+  ══════════════════════════════════════ -->
+  <section id="section-instructor">
+    <div class="wrap">
+      <span class="sec-label sec-label-dark">강사 소개</span>
+
+      <!-- 수치 배너 -->
+      <div class="instr-stats fade-up">
+        <div class="instr-stat">
+          <div class="num">10+</div>
+          <div class="label">R&D 전문 경력 (년)</div>
+        </div>
+        <div class="instr-stat">
+          <div class="num">50+</div>
+          <div class="label">협력 기업·기관</div>
+        </div>
+        <div class="instr-stat">
+          <div class="num">100%</div>
+          <div class="label">기획형 실무 교안</div>
+        </div>
+      </div>
+
+      <!-- 역할별 블록 -->
+      <div class="instr-roles">
+
+        <div class="instr-role fade-up">
+          <div class="instr-role-title">AI<br />EDUCATOR</div>
+          <div class="instr-role-body">
+            <p>
+              빅데이터 & AI R&D 10년 이상의 전문 지식으로, IT 비전공자도 업무 효율화를 바로 체감할 수 있는 맞춤형 교육을 설계합니다.
+            </p>
+            <p>
+              쉬운 언어로 개념을 풀고, 내일부터 바로 쓰는 워크플로우를 함께 만듭니다. 단순 툴 사용법이 아닌, 왜 써야 하는지·어떻게 비즈니스에 녹여낼지를 가르칩니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="instr-role fade-up">
+          <div class="instr-role-title">AX<br />CONSULTANT</div>
+          <div class="instr-role-body">
+            <p>
+              공공기관 스마트워크 도입 컨설팅부터 대기업·스타트업 대상 기획형 AI 실무 교육 설계·운영까지, 조직의 AI 내재화 전 과정을 함께합니다.
+            </p>
+            <p>
+              오픈소스 vs SaaS 편익 측정, 변화 관리 로드맵 실행까지 — AI 도입을 일회성 이벤트가 아닌 지속 가능한 시스템으로 만듭니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="instr-role fade-up">
+          <div class="instr-role-title">R&D<br />SPECIALIST</div>
+          <div class="instr-role-body">
+            <p>
+              한국지능정보사회진흥원(NIA) 주관 AI 학습데이터 구축 사업 다수 참여. 야구 판정 영상 데이터 200,000건, 자율주행 로봇 이미지 100,000건 등 대규모 AI 데이터 구축 경험을 보유합니다.
+            </p>
+            <p>
+              빅데이터 시스템 & 대규모 언어 모델 R&D 현장에서 다져진 실무 감각으로 강의합니다.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 경력 + 태그 -->
+      <div class="instr-bottom fade-up">
+        <div class="instr-career">
+          <h4>주요 경력</h4>
+          <div class="career-list">
+            <div class="career-item">
+              <div class="career-year">현재</div>
+              <div>
+                <div class="career-desc">대기업·스타트업 대상 기획형 AI 실무 교육 설계·운영</div>
+              </div>
+            </div>
+            <div class="career-item">
+              <div class="career-year">~2024</div>
+              <div>
+                <div class="career-desc">스피치로그 기획서비스팀 차장</div>
+                <div class="career-award">한국언론진흥재단 우수 미디어 스타트업 선정</div>
+              </div>
+            </div>
+            <div class="career-item">
+              <div class="career-year">다수</div>
+              <div>
+                <div class="career-desc">NIA 주관 AI 학습데이터 구축 사업 참여</div>
+                <div class="career-award">과학기술정보통신부 주관 사업 다수</div>
+              </div>
+            </div>
+            <div class="career-item">
+              <div class="career-year">10년+</div>
+              <div>
+                <div class="career-desc">빅데이터 시스템 & 대규모 언어 모델 R&D</div>
+              </div>
+            </div>
+            <div class="career-item">
+              <div class="career-year">공공</div>
+              <div>
+                <div class="career-desc">공공기관 스마트워크 도입 컨설팅</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="instr-skills">
+          <h4>보유 역량</h4>
+          <div class="skill-tags">
+            <span class="skill-tag">AI 쿼리 설계</span>
+            <span class="skill-tag">프롬프트 엔지니어링</span>
+            <span class="skill-tag">ChatGPT</span>
+            <span class="skill-tag">Claude</span>
+            <span class="skill-tag">Claude Code</span>
+            <span class="skill-tag">AX 전략</span>
+            <span class="skill-tag">기업 교육</span>
+            <span class="skill-tag">빅데이터</span>
+            <span class="skill-tag">LLM R&D</span>
+            <span class="skill-tag">업무 자동화</span>
+            <span class="skill-tag">비즈니스 기획</span>
+            <span class="skill-tag">퍼실리테이션</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       section-query-intro
+       나쁜 쿼리 vs 좋은 쿼리 + 3단계
+  ══════════════════════════════════════ -->
+  <section id="section-query-intro">
+    <div class="wrap">
+      <div class="query-header fade-up">
+        <span class="sec-label sec-label-light">쿼리란?</span>
+        <h2 class="query-title">AI에게 제대로<br />물어보는 기술</h2>
+        <p class="query-subtitle">같은 AI를 써도 결과가 다른 이유는 단 하나 — 쿼리(질문) 품질의 차이입니다.</p>
+      </div>
+
+      <div class="query-compare fade-up">
+        <div class="query-block bad">
+          <div class="query-block-label">❌ 나쁜 쿼리</div>
+          <div class="query-code">
+<span class="cm"># 막연하고 조건 없는 요청</span>
+
+<span class="hl">User:</span> <span class="str">"마케팅 문구 써줘"</span>
+
+<span class="cm">→ 제품도, 타겟도, 톤도 없음</span>
+<span class="cm">→ AI가 범용적 답변만 생성</span>
+<span class="cm">→ 즉시 쓸 수 없는 결과</span>
+          </div>
+        </div>
+        <div class="query-block good">
+          <div class="query-block-label">✅ 좋은 쿼리</div>
+          <div class="query-code">
+<span class="cm"># 역할 + 조건 + 출력 형식</span>
+
+<span class="kw">ROLE:</span>    <span class="str">"마케팅 카피라이터"</span>
+<span class="kw">TARGET:</span>  <span class="str">"30대 직장인, 비개발자"</span>
+<span class="kw">PRODUCT:</span> <span class="str">"AI 생산성 교육 과정"</span>
+<span class="kw">TONE:</span>    <span class="str">"전문적이되 친근하게"</span>
+<span class="kw">FORMAT:</span>  <span class="str">"3가지 버전, 각 80자 이내"</span>
+
+<span class="cm">→ 명확한 목적 → 바로 쓸 수 있는 결과</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="query-steps fade-up">
+        <div class="query-step">
+          <div class="step-num">01</div>
+          <div class="step-title">개념 이해</div>
+          <p class="step-desc">역할·조건·형식의 3요소를 이해하고, 효과적인 쿼리 구조를 학습합니다.</p>
+        </div>
+        <div class="query-step">
+          <div class="step-num">02</div>
+          <div class="step-title">실전 실습</div>
+          <p class="step-desc">보고서·기안서·이메일·기획서 등 실제 업무에 쿼리를 직접 적용합니다.</p>
+        </div>
+        <div class="query-step">
+          <div class="step-num">03</div>
+          <div class="step-title">업무 내재화</div>
+          <p class="step-desc">나만의 쿼리 라이브러리를 구축해 반복 업무를 체계적으로 자동화합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       section-programs
+       결과 중심 프로그램 카드 + 기업 키트
+  ══════════════════════════════════════ -->
+  <section id="section-programs">
+    <div class="wrap">
+      <div class="prog-header fade-up">
+        <span class="sec-label sec-label-dark">강의 프로그램</span>
+        <h2 class="prog-title">목적에 맞는<br />강의를 선택하세요</h2>
+        <p class="prog-desc">입문부터 기업 AX 도입까지, 현업 적용 중심으로 설계된 3가지 프로그램입니다.</p>
+      </div>
+
+      <div class="prog-tabs">
+        <div class="prog-tab active" data-tab="all">전체</div>
+        <div class="prog-tab" data-tab="solo">개인 수강</div>
+        <div class="prog-tab" data-tab="corp">기업 교육</div>
+      </div>
+
+      <!-- 전체 패널 -->
+      <div class="prog-panel active" id="panel-all">
+
+        <div class="prog-card fade-up">
+          <div class="prog-card-head">
+            <div class="prog-card-type">개인 수강 · 입문~중급</div>
+            <div class="prog-card-name">비전공자를 위한 AI 기초 & 비즈니스 활용</div>
+            <div class="prog-card-target">대상: AI 트렌드를 이해하고 맞춤 툴이 필요한 입문자</div>
+          </div>
+          <div class="prog-card-divider" style="margin: 24px 32px 0;"></div>
+          <div class="prog-card-results">
+            <h5>이 강의 후 달라지는 것</h5>
+            <ul>
+              <li>기안서 작성 속도 300% 단축 패턴 습득</li>
+              <li>ChatGPT·Claude·Midjourney 용도별 구분 사용</li>
+              <li>마케팅 카피·보고 자료 현장 클리닉 완성</li>
+              <li>아이디어를 30분 안에 기획서로 시각화</li>
+            </ul>
+          </div>
+          <div class="prog-card-footer">
+            <span class="prog-card-duration">3 STEP · 온라인</span>
+            <a href="#section-contact" class="btn btn-dark">수강 문의</a>
+          </div>
+        </div>
+
+        <div class="prog-card fade-up">
+          <div class="prog-card-head">
+            <div class="prog-card-type">개인 수강 · 중급~고급</div>
+            <div class="prog-card-name">Claude Code 실무 최적화 마스터</div>
+            <div class="prog-card-target">대상: 코드 자동화가 필요한 기획자·실무자</div>
+          </div>
+          <div class="prog-card-divider" style="margin: 24px 32px 0;"></div>
+          <div class="prog-card-results">
+            <h5>이 강의 후 달라지는 것</h5>
+            <ul>
+              <li>원하는 데이터 양식을 안정적으로 자동 추출</li>
+              <li>엑셀·이메일 발송 자동화 스크립트 직접 제작</li>
+              <li>사내 소규모 시스템 이식 및 배포 경험</li>
+              <li>디버깅 없이 혼자 유지·확장 가능한 수준</li>
+            </ul>
+          </div>
+          <div class="prog-card-footer">
+            <span class="prog-card-duration">3 STEP · 온라인</span>
+            <a href="#section-contact" class="btn btn-dark">수강 문의</a>
+          </div>
+        </div>
+
+        <div class="prog-card fade-up">
+          <div class="prog-card-head">
+            <div class="prog-card-type">기업 교육 · 커스텀 설계</div>
+            <div class="prog-card-name">기업 특화형 AX 도입 & 프로세스 설계</div>
+            <div class="prog-card-target">대상: 조직 효율화를 기획하는 기업 담당자</div>
+          </div>
+          <div class="prog-card-divider" style="margin: 24px 32px 0;"></div>
+          <div class="prog-card-results">
+            <h5>이 강의 후 달라지는 것</h5>
+            <ul>
+              <li>사내 프로세스 병목 포인트 진단 및 제거</li>
+              <li>AI 도입 프레임워크 (오픈소스 vs SaaS) 구축</li>
+              <li>팀 전용 쿼리 라이브러리 설계 완료</li>
+              <li>변화 관리 로드맵 실행 가능한 상태</li>
+            </ul>
+          </div>
+          <div class="prog-card-footer">
+            <span class="prog-card-duration">협의 · 온·오프라인</span>
+            <a href="#section-contact" class="btn btn-dark">교육 문의</a>
+          </div>
+        </div>
+
+      </div><!-- /panel-all -->
+
+      <!-- 개인 패널 -->
+      <div class="prog-panel" id="panel-solo">
+        <div class="prog-card fade-up">
+          <div class="prog-card-head">
+            <div class="prog-card-type">개인 수강 · 입문~중급</div>
+            <div class="prog-card-name">비전공자를 위한 AI 기초 & 비즈니스 활용</div>
+            <div class="prog-card-target">대상: AI 트렌드를 이해하고 맞춤 툴이 필요한 입문자</div>
+          </div>
+          <div class="prog-card-divider" style="margin: 24px 32px 0;"></div>
+          <div class="prog-card-results">
+            <h5>이 강의 후 달라지는 것</h5>
+            <ul>
+              <li>기안서 작성 속도 300% 단축 패턴 습득</li>
+              <li>ChatGPT·Claude·Midjourney 용도별 구분 사용</li>
+              <li>마케팅 카피·보고 자료 현장 클리닉 완성</li>
+              <li>아이디어를 30분 안에 기획서로 시각화</li>
+            </ul>
+          </div>
+          <div class="prog-card-footer">
+            <span class="prog-card-duration">3 STEP · 온라인</span>
+            <a href="#section-contact" class="btn btn-dark">수강 문의</a>
+          </div>
+        </div>
+        <div class="prog-card fade-up">
+          <div class="prog-card-head">
+            <div class="prog-card-type">개인 수강 · 중급~고급</div>
+            <div class="prog-card-name">Claude Code 실무 최적화 마스터</div>
+            <div class="prog-card-target">대상: 코드 자동화가 필요한 기획자·실무자</div>
+          </div>
+          <div class="prog-card-divider" style="margin: 24px 32px 0;"></div>
+          <div class="prog-card-results">
+            <h5>이 강의 후 달라지는 것</h5>
+            <ul>
+              <li>원하는 데이터 양식을 안정적으로 자동 추출</li>
+              <li>엑셀·이메일 발송 자동화 스크립트 직접 제작</li>
+              <li>사내 소규모 시스템 이식 및 배포 경험</li>
+              <li>디버깅 없이 혼자 유지·확장 가능한 수준</li>
+            </ul>
+          </div>
+          <div class="prog-card-footer">
+            <span class="prog-card-duration">3 STEP · 온라인</span>
+            <a href="#section-contact" class="btn btn-dark">수강 문의</a>
+          </div>
+        </div>
+      </div><!-- /panel-solo -->
+
+      <!-- 기업 패널 -->
+      <div class="prog-panel" id="panel-corp">
+        <div class="prog-card fade-up">
+          <div class="prog-card-head">
+            <div class="prog-card-type">기업 교육 · 커스텀 설계</div>
+            <div class="prog-card-name">기업 특화형 AX 도입 & 프로세스 설계</div>
+            <div class="prog-card-target">대상: 조직 효율화를 기획하는 기업 담당자</div>
+          </div>
+          <div class="prog-card-divider" style="margin: 24px 32px 0;"></div>
+          <div class="prog-card-results">
+            <h5>이 강의 후 달라지는 것</h5>
+            <ul>
+              <li>사내 프로세스 병목 포인트 진단 및 제거</li>
+              <li>AI 도입 프레임워크 (오픈소스 vs SaaS) 구축</li>
+              <li>팀 전용 쿼리 라이브러리 설계 완료</li>
+              <li>변화 관리 로드맵 실행 가능한 상태</li>
+            </ul>
+          </div>
+          <div class="prog-card-footer">
+            <span class="prog-card-duration">협의 · 온·오프라인</span>
+            <a href="#section-contact" class="btn btn-dark">교육 문의</a>
+          </div>
+        </div>
+      </div><!-- /panel-corp -->
+
+      <!-- 기업 담당자 키트 -->
+      <div class="corp-kit fade-up">
+        <div class="corp-kit-text">
+          <h4>기업 교육 담당자 키트</h4>
+          <p>강사 소개서, 커리큘럼 샘플, 교육 제안서 양식을 한 번에 받아보세요.</p>
+        </div>
+        <div class="corp-kit-actions">
+          <a href="#section-contact" class="btn btn-white">키트 요청하기</a>
+          <a href="#section-contact" class="btn btn-outline-white">교육 상담 예약</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       section-testimonials
+       수강생 후기
+  ══════════════════════════════════════ -->
+  <section id="section-testimonials">
+    <div class="wrap">
+      <div class="testi-header fade-up">
+        <span class="sec-label sec-label-light">수강생 후기</span>
+        <h2 class="testi-title">수강 후<br />달라진 것들</h2>
+      </div>
+      <div class="testi-grid">
+
+        <div class="testi-card fade-up">
+          <div class="testi-type">개인 수강 · AI 기초 과정</div>
+          <p class="testi-body">"보고서 쓰는 시간이 절반으로 줄었습니다. 쿼리 구조를 배우고 나니 AI가 동료처럼 느껴져요. 막막했던 빈 화면이 이제는 두렵지 않습니다."</p>
+          <div class="testi-author">
+            <div class="testi-avatar ph"></div>
+            <div>
+              <div class="testi-name">정○○</div>
+              <div class="testi-info">대기업 전략기획팀</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card fade-up">
+          <div class="testi-type">기업 교육 · AX 도입 과정</div>
+          <p class="testi-body">"팀 전체가 수강 후 공유 쿼리 라이브러리를 만들었더니, 신입 온보딩 시간까지 줄어드는 효과가 있었습니다. 재계약 의향 100%입니다."</p>
+          <div class="testi-author">
+            <div class="testi-avatar ph"></div>
+            <div>
+              <div class="testi-name">이○○ 팀장</div>
+              <div class="testi-info">IT 기업 교육 담당</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card fade-up">
+          <div class="testi-type">개인 수강 · Claude Code 과정</div>
+          <p class="testi-body">"프리랜서로 제안서를 혼자 쓰는 게 너무 힘들었는데, 강의 후 초안을 30분 안에 완성하게 됐습니다. 수주율도 체감상 확실히 올랐어요."</p>
+          <div class="testi-author">
+            <div class="testi-avatar ph"></div>
+            <div>
+              <div class="testi-name">박○○</div>
+              <div class="testi-info">UX 프리랜서</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       section-faq
+       자주 묻는 질문 아코디언
+  ══════════════════════════════════════ -->
+  <section id="section-faq">
+    <div class="wrap">
+      <div class="faq-layout">
+        <div class="faq-sidebar fade-up">
+          <span class="sec-label sec-label-dark">FAQ</span>
+          <h2 class="faq-sidebar-title">자주<br />묻는<br />질문</h2>
+          <p>더 궁금한 점은 문의 폼으로 편하게 남겨주세요.</p>
+        </div>
+        <div class="faq-list">
+
+          <div class="faq-item">
+            <div class="faq-q">
+              <span>AI나 코딩을 전혀 몰라도 수강할 수 있나요?</span>
+              <div class="faq-toggle">+</div>
+            </div>
+            <div class="faq-a">네, 개발 지식이나 AI 사용 경험이 없어도 괜찮습니다. 비전공자 입문 과정은 ChatGPT 가입부터 함께 시작하며, 쉬운 언어로 개념을 풀어 설명합니다.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q">
+              <span>온라인과 오프라인 중 어떻게 진행되나요?</span>
+              <div class="faq-toggle">+</div>
+            </div>
+            <div class="faq-a">개인 수강은 온라인(Zoom 또는 녹화 강의)으로 진행됩니다. 기업 교육은 온·오프라인 모두 가능하며, 방문 출강도 지원합니다.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q">
+              <span>기업 교육 커리큘럼을 우리 팀에 맞게 수정할 수 있나요?</span>
+              <div class="faq-toggle">+</div>
+            </div>
+            <div class="faq-a">가능합니다. 사전 인터뷰를 통해 팀의 직무·업무 특성에 맞는 맞춤 커리큘럼을 설계해 드립니다. 공공기관·금융·제조 등 업종별 특화 사례도 보유하고 있습니다.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q">
+              <span>강의 섭외·외부 강연은 어떻게 신청하나요?</span>
+              <div class="faq-toggle">+</div>
+            </div>
+            <div class="faq-a">아래 문의 폼에서 '강연 섭외'를 선택 후 행사 일정과 주제를 남겨주시면 영업일 기준 1일 이내 연락드립니다.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q">
+              <span>강의 후 질문은 어떻게 하나요?</span>
+              <div class="faq-toggle">+</div>
+            </div>
+            <div class="faq-a">수강 기간 동안 이메일 또는 오픈카카오 채널을 통해 질문 답변을 제공합니다. 기업 교육은 수료 후 1개월 follow-up 세션이 포함됩니다.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q">
+              <span>비용은 어떻게 되나요?</span>
+              <div class="faq-toggle">+</div>
+            </div>
+            <div class="faq-a">개인 수강 비용은 문의 시 안내드립니다. 기업 교육은 인원·기간·커스터마이징 범위에 따라 달라지므로, 문의 폼을 통해 상담 후 견적을 제공합니다.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       section-contact
+       대화체 CTA + 문의 폼 + 연락처
+  ══════════════════════════════════════ -->
+  <section id="section-contact">
+    <div class="wrap">
+      <div class="contact-grid">
+
+        <div class="fade-up">
+          <span class="sec-label sec-label-dark">문의하기</span>
+          <h2 class="contact-cta">함께 시작할<br />준비가<br />되셨나요?</h2>
+          <p class="contact-desc">강의·강연·컨설팅 문의를 남겨주세요.<br />영업일 기준 1일 이내 답변드립니다.</p>
+          <div class="contact-links">
+            <div class="contact-link">
+              <span class="contact-link-label">이메일</span>
+              <span class="contact-link-value">typeholic@gmail.com</span>
+            </div>
+            <div class="contact-link">
+              <span class="contact-link-label">전화</span>
+              <span class="contact-link-value">010-9886-5128</span>
+            </div>
+            <div class="contact-link">
+              <span class="contact-link-label">카카오</span>
+              <span class="contact-link-value">오픈카카오 채널 (TBD)</span>
+            </div>
+            <div class="contact-link">
+              <span class="contact-link-label">유튜브</span>
+              <span class="contact-link-value">채널 링크 (TBD)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form fade-up">
+          <div class="form-row">
+            <div class="form-group">
+              <label>이름 *</label>
+              <input type="text" placeholder="홍길동" />
+            </div>
+            <div class="form-group">
+              <label>이메일 *</label>
+              <input type="email" placeholder="hello@example.com" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>문의 유형 *</label>
+            <select>
+              <option value="" disabled selected>선택해주세요</option>
+              <option>개인 수강 문의</option>
+              <option>기업 교육 문의</option>
+              <option>강연 섭외</option>
+              <option>AX 컨설팅</option>
+              <option>기타</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>소속 (선택)</label>
+            <input type="text" placeholder="회사명 또는 직함" />
+          </div>
+          <div class="form-group">
+            <label>문의 내용 *</label>
+            <textarea placeholder="강의 희망 일정, 규모, 주제 등을 자유롭게 적어주세요."></textarea>
+          </div>
+          <div class="form-privacy">
+            <input type="checkbox" id="privacy" />
+            <label for="privacy">개인정보 수집·이용에 동의합니다. 수집된 정보는 문의 답변 목적으로만 사용됩니다.</label>
+          </div>
+          <button class="form-submit">문의 보내기</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       footer-global
+  ══════════════════════════════════════ -->
+  <footer id="footer-global">
+    <div class="wrap">
+      <div class="footer-slogan">"AI는 도구일 뿐, 핵심은 비즈니스 기획입니다"</div>
+      <div class="footer-right">
+        <img src="assets/sanghun-ax-logo-generated.png" alt="sanghun ax" style="height:40px; width:auto; display:block; margin-bottom:8px; opacity:0.7; filter:brightness(10);" />
+        <div class="footer-copy">© 2026 최상훈. All rights reserved.</div>
+        <div class="footer-links">
+          <a href="#">개인정보처리방침</a>
+          <a href="#">이용약관</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <script>
+    /* ── Nav 스크롤 효과 ── */
+    const nav = document.getElementById('nav-global');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    /* ── 모바일 햄버거 ── */
+    const hamburger   = document.getElementById('hamburger');
+    const mobileMenu  = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+    function closeMobile() { mobileMenu.classList.remove('open'); }
+
+    /* ── 히어로 순환 증거 문구 ── */
+    const rotating = document.getElementById('rotatingText');
+    const items    = rotating.querySelectorAll('span');
+    let current    = 0;
+    setInterval(() => {
+      current = (current + 1) % items.length;
+      rotating.style.transform = `translateY(-${current * 32}px)`;
+    }, 2800);
+
+    /* ── 프로그램 탭 ── */
+    const tabs   = document.querySelectorAll('.prog-tab');
+    const panels = { all: 'panel-all', solo: 'panel-solo', corp: 'panel-corp' };
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const key = tab.dataset.tab;
+        document.querySelectorAll('.prog-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(panels[key]).classList.add('active');
+      });
+    });
+
+    /* ── FAQ 아코디언 ── */
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.querySelector('.faq-q').addEventListener('click', () => {
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+
+    /* ── 스크롤 페이드인 ── */
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
