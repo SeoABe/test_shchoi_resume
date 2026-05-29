@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oxygen:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- Supabase JS SDK (백엔드 연동). 설정 전에는 데모 모드로 동작합니다. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -854,6 +856,20 @@
 
 
   <script>
+    /* ═══════════════════════════════════════════════════════════
+       Supabase 설정 — 아래 두 값을 본인 프로젝트 값으로 교체하세요.
+       (Supabase 대시보드 → Project Settings → API 에서 확인)
+       값을 채우기 전까지는 자동으로 "데모 모드"(localStorage)로 동작합니다.
+       설정 가이드: SUPABASE_SETUP.md 참고
+    ═══════════════════════════════════════════════════════════ */
+    const SUPABASE_URL      = 'YOUR_SUPABASE_URL';        // 예: https://abcd.supabase.co
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';   // 예: eyJhbGciOi...
+
+    const SB_CONFIGURED = SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 30;
+    const sb = SB_CONFIGURED && window.supabase
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
+
     /* ───────── Course data ───────── */
     const COURSES = {
       basic:      { name: '비전공자를 위한 AI 기초 & 비즈니스 활용', duration: '4주 온라인', price: 180000 },
@@ -863,13 +879,37 @@
     };
     const won = n => n.toLocaleString('ko-KR') + '원';
 
-    /* ───────── Auth state (localStorage demo) ───────── */
-    function getUser()  { try { return JSON.parse(localStorage.getItem('cx_user')); } catch(e){ return null; } }
-    function setUser(u) { localStorage.setItem('cx_user', JSON.stringify(u)); refreshNav(); }
-    function logout()   { localStorage.removeItem('cx_user'); refreshNav(); toast('로그아웃되었습니다'); }
+    /* ───────── Auth state ───────── */
+    let currentUser = null;  // { name, email, phone? } — 동기 캐시 (DB 세션과 동기화)
 
-    function refreshNav() {
-      const u = getUser();
+    // 데모 모드 fallback 저장소
+    function getDemoUser()  { try { return JSON.parse(localStorage.getItem('cx_user')); } catch(e){ return null; } }
+    function setDemoUser(u) { localStorage.setItem('cx_user', JSON.stringify(u)); }
+
+    // Supabase 에러 메시지 한글화
+    function krAuthError(e) {
+      const m = (e.message || '').toLowerCase();
+      if (m.includes('invalid login'))                      return '이메일 또는 비밀번호가 올바르지 않습니다.';
+      if (m.includes('already') && m.includes('registered'))return '이미 가입된 이메일입니다. 로그인해주세요.';
+      if (m.includes('user already registered'))            return '이미 가입된 이메일입니다. 로그인해주세요.';
+      if (m.includes('password'))                           return '비밀번호는 6자 이상이어야 합니다.';
+      if (m.includes('email') && m.includes('confirm'))     return '이메일 인증이 필요합니다. 메일함을 확인해주세요.';
+      return e.message || '오류가 발생했습니다.';
+    }
+
+    async function refreshNav() {
+      let u = null;
+      if (SB_CONFIGURED) {
+        const { data } = await sb.auth.getUser();
+        if (data && data.user) {
+          const meta = data.user.user_metadata || {};
+          u = { name: meta.name || data.user.email.split('@')[0], email: data.user.email, phone: meta.phone || '' };
+        }
+      } else {
+        u = getDemoUser();
+      }
+      currentUser = u;
+
       const login  = document.querySelector('.nav-login');
       const signup = document.querySelector('.nav-signup');
       const userBox = document.getElementById('nav-user');
@@ -881,6 +921,14 @@
         login.style.display = ''; signup.style.display = '';
         userBox.style.display = 'none';
       }
+    }
+
+    async function logout() {
+      if (SB_CONFIGURED) { await sb.auth.signOut(); }
+      else { localStorage.removeItem('cx_user'); }
+      currentUser = null;
+      await refreshNav();
+      toast('로그아웃되었습니다');
     }
 
     /* ───────── Modal control ───────── */
@@ -911,7 +959,7 @@
     }
 
     function openAuth(mode) {
-      const u = getUser();
+      const u = currentUser;
       if (u && mode !== 'login') { // already logged in → go straight to course select
         goSelect();
         document.getElementById('modalTitle').textContent = '강좌 신청';
@@ -934,38 +982,78 @@
     }
 
     /* ───────── Login ───────── */
-    function doLogin() {
+    async function doLogin() {
       const email = document.getElementById('loginEmail').value.trim();
       const pw    = document.getElementById('loginPw').value;
       const err   = document.getElementById('loginError');
+      const btn   = event && event.target;
       if (!email || !pw) { err.textContent = '이메일과 비밀번호를 입력해주세요.'; return; }
-      // demo: accept any matching stored user or create lightweight session
-      const stored = getUser();
-      let name = stored && stored.email === email ? stored.name : email.split('@')[0];
-      setUser({ name, email });
+
+      if (SB_CONFIGURED) {
+        if (btn) { btn.disabled = true; btn.textContent = '로그인 중...'; }
+        const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+        if (btn) { btn.disabled = false; btn.textContent = '로그인'; }
+        if (error) { err.textContent = krAuthError(error); return; }
+        const meta = data.user.user_metadata || {};
+        currentUser = { name: meta.name || email.split('@')[0], email, phone: meta.phone || '' };
+      } else {
+        const stored = getDemoUser();
+        const name = stored && stored.email === email ? stored.name : email.split('@')[0];
+        setDemoUser({ name, email }); currentUser = { name, email };
+      }
       err.textContent = '';
-      toast(name + ' 님, 환영합니다');
+      await refreshNav();
+      toast(currentUser.name + ' 님, 환영합니다');
       afterAuth();
     }
 
     /* ───────── Signup ───────── */
-    function doSignup() {
+    async function doSignup() {
       const name  = document.getElementById('suName').value.trim();
       const email = document.getElementById('suEmail').value.trim();
       const phone = document.getElementById('suPhone').value.trim();
       const pw    = document.getElementById('suPw').value;
       const agree = document.getElementById('suAgree').checked;
       const err   = document.getElementById('signupError');
+      const btn   = event && event.target;
 
       if (!name)  { err.textContent = '이름을 입력해주세요.'; return; }
       if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = '올바른 이메일을 입력해주세요.'; return; }
       if (pw.length < 6) { err.textContent = '비밀번호는 6자 이상이어야 합니다.'; return; }
       if (!agree) { err.textContent = '개인정보 수집·이용에 동의해주세요.'; return; }
-
       err.textContent = '';
-      setUser({ name, email, phone });
+
+      if (SB_CONFIGURED) {
+        if (btn) { btn.disabled = true; btn.textContent = '가입 중...'; }
+        const { data, error } = await sb.auth.signUp({
+          email, password: pw, options: { data: { name, phone } }
+        });
+        if (btn) { btn.disabled = false; btn.textContent = '가입하고 계속하기'; }
+        if (error) { err.textContent = krAuthError(error); return; }
+        if (!data.session) {  // 이메일 인증 ON → 세션 미발급
+          showEmailConfirmNotice(email); return;
+        }
+        currentUser = { name, email, phone };
+      } else {
+        setDemoUser({ name, email, phone }); currentUser = { name, email, phone };
+      }
+      await refreshNav();
       toast(name + ' 님, 가입을 환영합니다!');
       afterAuth();
+    }
+
+    /* 이메일 인증 안내 (Supabase에서 Confirm email이 켜진 경우) */
+    function showEmailConfirmNotice(email) {
+      goStep('success');
+      document.getElementById('stepsIndicator').style.display = 'none';
+      const icon = document.querySelector('#step-success .success-icon');
+      icon.textContent = '✉'; icon.style.background = 'var(--accent)';
+      document.querySelector('#step-success .success-title').textContent = '이메일을 확인해주세요';
+      document.getElementById('successDesc').innerHTML =
+        `<strong style="color:var(--black);">${email}</strong> 로 인증 메일을 보냈습니다.<br />` +
+        `메일의 링크를 눌러 인증을 완료한 뒤 로그인하면 강좌를 신청할 수 있어요.`;
+      document.getElementById('modalTitle').textContent = '가입 완료';
+      document.getElementById('modalSub').textContent = '한 단계만 남았어요';
     }
 
     /* after login/signup: go to course select (or confirm if course pending) */
@@ -976,7 +1064,7 @@
     /* ───────── Course select ───────── */
     function applyCourse(key) {
       pendingCourse = key;
-      const u = getUser();
+      const u = currentUser;
       if (!u) {
         switchAuth('signup');
         document.getElementById('modalSub').textContent = '가입 후 바로 신청할 수 있어요';
@@ -992,7 +1080,7 @@
       renderCourseOptions();
       goStep('select');
       document.getElementById('modalTitle').textContent = '강좌 선택';
-      const u = getUser();
+      const u = currentUser;
       document.getElementById('modalSub').textContent = (u ? u.name + ' 님, ' : '') + '신청할 강좌를 골라주세요';
     }
 
@@ -1016,7 +1104,7 @@
 
     function goConfirm() {
       if (!selectedCourse) { document.getElementById('selectError').textContent = '강좌를 선택해주세요.'; return; }
-      const u = getUser(); const c = COURSES[selectedCourse];
+      const u = currentUser; const c = COURSES[selectedCourse];
       document.getElementById('cfName').textContent = u.name;
       document.getElementById('cfEmail').textContent = u.email;
       document.getElementById('cfCourse').textContent = c.name;
@@ -1027,13 +1115,29 @@
       document.getElementById('modalSub').textContent = '내용을 확인하고 신청하세요';
     }
 
-    function doEnroll() {
-      const u = getUser(); const c = COURSES[selectedCourse];
-      // save enrollment (demo)
-      const enrolls = JSON.parse(localStorage.getItem('cx_enrolls') || '[]');
-      enrolls.push({ course: selectedCourse, name: u.name, email: u.email, at: new Date().toISOString() });
-      localStorage.setItem('cx_enrolls', JSON.stringify(enrolls));
+    async function doEnroll() {
+      const u = currentUser; const c = COURSES[selectedCourse];
+      const btn = event && event.target;
+
+      if (SB_CONFIGURED) {
+        if (btn) { btn.disabled = true; btn.textContent = '신청 처리 중...'; }
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) { if (btn){btn.disabled=false;btn.textContent='신청 완료하기';} toast('세션이 만료되었습니다. 다시 로그인해주세요.'); switchAuth('login'); return; }
+        const { error } = await sb.from('enrollments').insert({
+          user_id: user.id, course_key: selectedCourse, course_name: c.name, price: c.price, status: 'pending'
+        });
+        if (btn) { btn.disabled = false; btn.textContent = '신청 완료하기'; }
+        if (error) { toast('신청 저장 실패: ' + error.message); return; }
+      } else {
+        const enrolls = JSON.parse(localStorage.getItem('cx_enrolls') || '[]');
+        enrolls.push({ course: selectedCourse, name: u.name, email: u.email, at: new Date().toISOString() });
+        localStorage.setItem('cx_enrolls', JSON.stringify(enrolls));
+      }
+
       goStep('success');
+      const icon = document.querySelector('#step-success .success-icon');
+      icon.textContent = '✓'; icon.style.background = 'var(--green)';
+      document.querySelector('#step-success .success-title').textContent = '신청 완료!';
       document.getElementById('modalTitle').textContent = '신청 완료';
       document.getElementById('modalSub').textContent = '감사합니다';
       const priceLine = c.price ? `결제 예정 금액 ${won(c.price)}` : '담당자가 견적과 함께 연락드립니다';
@@ -1084,6 +1188,11 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
     /* init */
+    if (SB_CONFIGURED) {
+      sb.auth.onAuthStateChange(() => refreshNav());
+    } else {
+      console.info('[course] 데모 모드로 동작 중입니다. SUPABASE_URL / SUPABASE_ANON_KEY 를 설정하면 실제 백엔드로 연동됩니다.');
+    }
     refreshNav();
   </script>
 </body>
