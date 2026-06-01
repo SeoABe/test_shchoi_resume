@@ -473,7 +473,13 @@
       .pricing-table { font-size: 11px; display: block; overflow-x: auto; white-space: nowrap; }
       .hero-stats { gap: 28px; }
     }
-    @media (max-width: 480px) { .flow-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 480px) {
+      .flow-grid { grid-template-columns: 1fr; }
+      /* 좁은 화면 상단바 정리: 배지·테마 라벨 숨겨 여백 확보 */
+      .nav-badge { display: none; }
+      .theme-label { display: none; }
+      .nav-actions { gap: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -500,7 +506,7 @@
       </div>
       <div class="nav-actions">
         <div class="theme-menu">
-          <button class="theme-btn" id="themeBtn" onclick="toggleThemeMenu(event)">🎨 테마 ▾</button>
+          <button class="theme-btn" id="themeBtn" onclick="toggleThemeMenu(event)">🎨<span class="theme-label"> 테마 ▾</span></button>
           <div class="theme-dropdown" id="themeDropdown">
             <div class="theme-opt" data-theme-opt="default" onclick="setTheme('default')"><span class="theme-dot" style="background:#4f46e5"></span>기본 · 인디고</div>
             <div class="theme-opt" data-theme-opt="brown" onclick="setTheme('brown')"><span class="theme-dot" style="background:#b07d4f"></span>브라운 · 라이트</div>
