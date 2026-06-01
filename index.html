@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="brown">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1512,7 +1512,7 @@
     function toggleThemeMenu(e) { if (e) e.stopPropagation(); document.getElementById('themeDropdown').classList.toggle('open'); }
     function closeThemeMenu() { document.getElementById('themeDropdown').classList.remove('open'); }
     document.addEventListener('click', e => { if (!e.target.closest('.theme-menu')) closeThemeMenu(); });
-    applyTheme(localStorage.getItem('cx_theme') || 'default');
+    applyTheme(localStorage.getItem('cx_theme') || 'brown');
 
     /* init */
     if (SB_CONFIGURED) {
