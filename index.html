@@ -191,6 +191,21 @@
     .sec-desc { max-width: 580px; margin-bottom: 56px; }
 
     /* ══ AI 제안서 작성 (Featured) ══ */
+    /* ══ INSTRUCTOR ══ */
+    .instructor-grid { display: grid; grid-template-columns: 360px 1fr; gap: 56px; align-items: center; }
+    .instructor-photo-wrap { position: relative; }
+    .instructor-photo { width: 100%; display: block; border: 1px solid var(--border); }
+    .instructor-photo-badge {
+      position: absolute; bottom: 16px; left: 16px;
+      background: var(--accent); color: #fff;
+      font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 6px 14px;
+    }
+    .instructor-cred { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 4px 0 28px; }
+    .instructor-cred li { font-size: 14px; color: var(--black); display: flex; gap: 10px; align-items: flex-start; }
+    .instructor-cred li::before { content: "✓"; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+    @media (max-width: 768px) { .instructor-grid { grid-template-columns: 1fr; gap: 28px; } }
+
     #proposal { background: var(--gray-light); }
     .proposal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
     .proposal-step {
@@ -575,6 +590,33 @@
 
 <span class="cm">→ 제안서 전체 골격 + 핵심 카피 + 견적표 초안 자동 생성</span>
 <span class="cm">→ 작성 시간 <span class="hl">3시간 → 30분</span>, 수주율 체감 상승</span></pre></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ INSTRUCTOR ══ -->
+  <section id="instructor" class="section">
+    <div class="wrap">
+      <div class="instructor-grid fade-up">
+        <div class="instructor-photo-wrap">
+          <img src="assets/choi-instructor-generated-profile.png" alt="최상훈 강사 프로필" class="instructor-photo" />
+          <div class="instructor-photo-badge">AI Educator</div>
+        </div>
+        <div class="instructor-info">
+          <div class="sec-eyebrow"><span class="sec-num">★</span> Instructor</div>
+          <h2 class="sec-title">강사 최상훈</h2>
+          <p class="sec-desc" style="margin-bottom:24px;">“AI는 도구일 뿐, 핵심은 비즈니스 기획입니다.” 빅데이터·LLM R&D 현장에서 다져진 실무 감각으로, 비전공자도 내일부터 바로 쓰는 워크플로우를 함께 만듭니다.</p>
+          <ul class="instructor-cred">
+            <li>빅데이터 &amp; 대규모 언어모델 R&amp;D 경력 10년+</li>
+            <li>기업·기관 50곳 이상 AI 교육·AX 컨설팅</li>
+            <li>NIA 주관 AI 학습데이터 구축 사업 다수 참여</li>
+            <li>기획 기반 실무 교안 100% — 현업 적용 중심 설계</li>
+          </ul>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="about.html" class="btn btn-dark">강사 소개 자세히 보기</a>
+            <a href="https://forms.gle/DcSaMz7kNUxGnNNK8" target="_blank" rel="noopener" class="btn btn-outline">문의하기</a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
