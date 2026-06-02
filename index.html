@@ -455,13 +455,45 @@
     #scroll-top.show { opacity: 1; transform: none; }
 
     /* mobile menu */
-    .mobile-menu { display: none; position: fixed; inset: 56px 0 0 0; background: #fff; z-index: 150; flex-direction: column; align-items: center; justify-content: center; gap: 28px; }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a { font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--black); }
+    /* 햄버거 메뉴 (칩 기반 재설계) */
+    .mobile-menu { display: none; position: fixed; inset: 56px 0 0 0; background: var(--white); z-index: 150; overflow-y: auto; }
+    .mobile-menu.open { display: block; }
+    .mm-inner { padding: 28px 24px 40px; max-width: 520px; margin: 0 auto; }
+    .mm-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-body); margin: 0 0 14px; }
+    .mm-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+    .mm-chip { font-size: 14px; font-weight: 700; color: var(--black); background: var(--gray-light);
+               border: 1px solid var(--border); padding: 12px 18px; border-radius: 30px; }
+    .mm-chip:active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .mm-divider { height: 1px; background: var(--border); margin: 28px 0; }
+    .mm-actions { display: flex; gap: 10px; }
+    .mm-btn { flex: 1; font-family: 'Oxygen', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px;
+              padding: 14px; border: 1.5px solid var(--border); background: var(--white); color: var(--black); cursor: pointer; border-radius: 6px; }
+    .mm-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .mm-btn.on { border-color: var(--accent); color: var(--accent); }
+    .mm-user { font-size: 14px; font-weight: 700; color: var(--black); margin-bottom: 12px; }
+    .mm-user span { color: var(--accent); }
+
+    /* 하단 고정 탭바 (모바일) */
+    .bottom-tabs { display: none; }
+    .btab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 3px; padding: 8px 0 7px; font-size: 10px; font-weight: 700; letter-spacing: .5px;
+            color: var(--gray-body); cursor: pointer; background: none; border: none; }
+    .btab .ic { font-size: 19px; line-height: 1; }
+    .btab.active { color: var(--accent); }
+    .btab.cta { background: var(--accent); color: #fff; }
 
     @media (max-width: 860px) {
       .nav-links { display: none; }
       .nav-mobile-toggle { display: flex; }
+      /* 상단 로그인/회원가입/유저칩은 햄버거로 이동 (상단바 정리) */
+      .nav-login, .nav-signup { display: none; }
+      #nav-user { display: none !important; }
+      /* 하단 고정 탭바 노출 */
+      .bottom-tabs { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 180;
+        background: var(--white); border-top: 1px solid var(--border); box-shadow: 0 -4px 20px rgba(0,0,0,.07); }
+      body { padding-bottom: 60px; }
+      #scroll-top { display: none; }
+      #toast { bottom: 78px; }
       .course-card { grid-template-columns: 1fr; }
       .course-price { border-left: none; border-top: 1px solid var(--border); }
       .course-card.featured .course-price { border-top-color: var(--accent); }
@@ -524,12 +556,29 @@
   </nav>
 
   <div class="mobile-menu" id="mobileMenu">
-    <a href="#proposal" onclick="closeMobile()">왜 이 강의?</a>
-    <a href="#courses" onclick="closeMobile()">강좌</a>
-    <a href="#pricing" onclick="closeMobile()">가격</a>
-    <a href="#enroll" onclick="closeMobile()">수강 절차</a>
-    <a href="#faq" onclick="closeMobile()">FAQ</a>
-    <a href="https://forms.gle/DcSaMz7kNUxGnNNK8" target="_blank" rel="noopener" onclick="closeMobile()">문의하기</a>
+    <div class="mm-inner">
+      <div class="mm-label">바로가기</div>
+      <div class="mm-chips">
+        <a href="#proposal"   class="mm-chip" onclick="closeMobile()">왜 이 강의?</a>
+        <a href="#instructor" class="mm-chip" onclick="closeMobile()">강사 소개</a>
+        <a href="#courses"    class="mm-chip" onclick="closeMobile()">강좌</a>
+        <a href="#pricing"    class="mm-chip" onclick="closeMobile()">가격</a>
+        <a href="#enroll"     class="mm-chip" onclick="closeMobile()">수강 절차</a>
+        <a href="#faq"        class="mm-chip" onclick="closeMobile()">FAQ</a>
+        <a href="https://forms.gle/DcSaMz7kNUxGnNNK8" target="_blank" rel="noopener" class="mm-chip" onclick="closeMobile()">문의하기</a>
+      </div>
+
+      <div class="mm-divider"></div>
+      <div class="mm-label">계정</div>
+      <div id="mmAccount"></div>
+
+      <div class="mm-divider"></div>
+      <div class="mm-label">테마</div>
+      <div class="mm-actions">
+        <button class="mm-btn" id="mmThemeBrown"   onclick="setTheme('brown'); closeMobile();">브라운</button>
+        <button class="mm-btn" id="mmThemeDefault" onclick="setTheme('default'); closeMobile();">인디고</button>
+      </div>
+    </div>
   </div>
 
   <!-- ══ HERO ══ -->
@@ -884,6 +933,14 @@
     </div>
   </footer>
 
+  <!-- ══ 하단 고정 탭바 (모바일) ══ -->
+  <nav class="bottom-tabs" id="bottomTabs">
+    <button class="btab" data-spy="top"     onclick="scrollToId('top')"><span class="ic">🏠</span>홈</button>
+    <button class="btab" data-spy="courses" onclick="scrollToId('courses')"><span class="ic">📚</span>강좌</button>
+    <button class="btab" data-spy="pricing" onclick="scrollToId('pricing')"><span class="ic">💰</span>가격</button>
+    <button class="btab cta" onclick="openAuth('signup')"><span class="ic">✏️</span>신청</button>
+  </nav>
+
 
   <!-- ══════════════════════════════════════
        AUTH + ENROLL MODAL
@@ -1097,6 +1154,25 @@
       } else {
         login.style.display = ''; signup.style.display = '';
         userBox.style.display = 'none';
+      }
+      renderMobileAccount();
+    }
+
+    /* 햄버거 메뉴 — 계정 섹션 (로그인 상태 반영) */
+    function renderMobileAccount() {
+      const el = document.getElementById('mmAccount');
+      if (!el) return;
+      if (currentUser) {
+        el.innerHTML =
+          `<div class="mm-user"><span>${currentUser.name}</span> 님으로 로그인됨</div>` +
+          `<div class="mm-actions">` +
+          `<button class="mm-btn primary" onclick="closeMobile(); openAuth('signup')">강좌 신청</button>` +
+          `<button class="mm-btn" onclick="closeMobile(); logout()">로그아웃</button></div>`;
+      } else {
+        el.innerHTML =
+          `<div class="mm-actions">` +
+          `<button class="mm-btn" onclick="closeMobile(); openAuth('login')">로그인</button>` +
+          `<button class="mm-btn primary" onclick="closeMobile(); openAuth('signup')">회원가입</button></div>`;
       }
     }
 
@@ -1496,8 +1572,33 @@
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
     /* ───────── Mobile menu ───────── */
-    document.getElementById('mobileToggle').addEventListener('click', () => document.getElementById('mobileMenu').classList.toggle('open'));
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+      renderMobileAccount();
+      document.getElementById('mobileMenu').classList.toggle('open');
+    });
     function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); }
+
+    /* ───────── 섹션 스크롤 (하단 탭바) ───────── */
+    function scrollToId(id) {
+      if (id === 'top') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+      const el = document.getElementById(id);
+      if (el) window.scrollTo({ top: el.offsetTop - 50, behavior: 'smooth' });
+    }
+    /* 하단 탭 현재 위치 하이라이트 (스크롤스파이) */
+    const spyMap = [ ['pricing','pricing'], ['courses','courses'], ['top','top'] ]; // 아래에서 위로 우선순위
+    function updateBottomSpy() {
+      const y = window.scrollY + 120;
+      let active = 'top';
+      const courses = document.getElementById('courses');
+      const pricing = document.getElementById('pricing');
+      if (pricing && y >= pricing.offsetTop) active = 'pricing';
+      else if (courses && y >= courses.offsetTop) active = 'courses';
+      else active = 'top';
+      document.querySelectorAll('.btab[data-spy]').forEach(t =>
+        t.classList.toggle('active', t.dataset.spy === active));
+    }
+    window.addEventListener('scroll', updateBottomSpy);
+    updateBottomSpy();
 
     /* ───────── ESC to close ───────── */
     document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeThemeMenu(); } });
@@ -1508,6 +1609,9 @@
       else document.documentElement.removeAttribute('data-theme');
       document.querySelectorAll('.theme-opt').forEach(o =>
         o.classList.toggle('active', o.dataset.themeOpt === (t || 'default')));
+      // 햄버거 메뉴의 테마 버튼 강조
+      const br = document.getElementById('mmThemeBrown'), df = document.getElementById('mmThemeDefault');
+      if (br && df) { br.classList.toggle('on', t === 'brown'); df.classList.toggle('on', t !== 'brown'); }
     }
     function setTheme(t) {
       applyTheme(t);
