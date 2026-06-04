@@ -1,0 +1,36 @@
+email,name,type,newsletter_opt_in,signup_date,course_key,course_name,list_price,discount,paid_price,coupon_code,purchase_date
+demo_probe1@demo.seed,프로브,member,true,(probe),proposal,AI 활용 제안서·기획서 마스터,240000,0,240000,,(probe)
+demo_01@demo.seed,김민준,member,true,2026-05-27 00:00,proposal,AI 활용 제안서·기획서 마스터,240000,0,240000,,2026-05-28 03:00
+demo_01@demo.seed,김민준,member,true,2026-05-27 00:00,book-proposal,AI 활용 제안서·기획서 마스터 (도서),19800,0,19800,,2026-05-30 05:00
+demo_02@demo.seed,이서연,member,false,2026-05-20 01:00,book-aigap,AI 초격차 (도서),22000,11000,11000,50%,2026-05-22 04:00
+demo_03@demo.seed,박도윤,member,true,2026-05-13 02:00,,,,,,,
+demo_04@demo.seed,최지우,member,false,2026-06-02 03:00,proposal,AI 활용 제안서·기획서 마스터,240000,0,240000,,2026-06-02 11:00
+demoG_05@guest.test,정하준,guest,false,2026-05-26 04:00,claudecode,Claude Code 실무 최적화 마스터,300000,0,300000,,2026-05-27 12:00
+demo_06@demo.seed,강서윤,member,false,2026-05-19 05:00,book-proposal,AI 활용 제안서·기획서 마스터 (도서),19800,0,19800,,2026-05-21 13:00
+demo_07@demo.seed,조예준,member,true,2026-05-12 06:00,proposal,AI 활용 제안서·기획서 마스터,240000,0,240000,,2026-05-15 01:00
+demo_07@demo.seed,조예준,member,true,2026-05-12 06:00,claudecode,Claude Code 실무 최적화 마스터,300000,0,300000,,2026-05-17 11:00
+demo_08@demo.seed,윤하은,member,false,2026-06-01 07:00,book-aigap,AI 초격차 (도서),22000,6600,15400,30%,2026-06-01 03:00
+demo_09@demo.seed,장주원,member,true,2026-05-25 08:00,,,,,,,
+demo_10@demo.seed,임지호,member,false,2026-05-18 09:00,basic,비전공자를 위한 AI 기초 & 비즈니스 활용,180000,0,180000,,2026-05-20 10:00
+demoG_11@guest.test,한수아,guest,false,2026-05-11 10:00,proposal,AI 활용 제안서·기획서 마스터,240000,0,240000,,2026-05-14 11:00
+demo_12@demo.seed,오지안,member,false,2026-05-30 23:00,claudecode,Claude Code 실무 최적화 마스터,300000,0,300000,,2026-05-31 12:00
+demo_13@demo.seed,서건우,member,true,2026-05-24 00:00,book-aigap,AI 초격차 (도서),22000,0,22000,,2026-05-25 13:00
+demo_13@demo.seed,서건우,member,true,2026-05-24 00:00,book-aigap,AI 초격차 (도서),22000,0,22000,,2026-05-27 05:00
+demo_14@demo.seed,신채원,member,false,2026-05-17 01:00,proposal,AI 활용 제안서·기획서 마스터,240000,50000,190000,50000WON,2026-05-19 01:00
+demo_15@demo.seed,권우진,member,true,2026-05-10 02:00,,,,,,,
+demo_16@demo.seed,황유진,member,false,2026-05-30 03:00,book-dify,노코드 AI와 Dify 시작하기 (도서),24000,0,24000,,2026-05-30 04:00
+demoG_17@guest.test,안현우,guest,false,2026-05-23 04:00,proposal,AI 활용 제안서·기획서 마스터,240000,0,240000,,2026-05-24 10:00
+demo_18@demo.seed,송다은,member,false,2026-05-16 05:00,book-aigap,AI 초격차 (도서),22000,0,22000,,2026-05-18 11:00
+demo_19@demo.seed,류선우,member,true,2026-05-09 06:00,book-proposal,AI 활용 제안서·기획서 마스터 (도서),19800,0,19800,,2026-05-12 12:00
+demo_19@demo.seed,류선우,member,true,2026-05-09 06:00,proposal,AI 활용 제안서·기획서 마스터,240000,0,240000,,2026-05-14 11:00
+demo_20@demo.seed,전은우,member,false,2026-05-29 07:00,proposal,AI 활용 제안서·기획서 마스터,240000,120000,120000,50%,2026-05-29 13:00
+demo_21@demo.seed,홍시윤,member,true,2026-05-22 08:00,,,,,,,
+demo_22@demo.seed,고지민,member,false,2026-05-15 09:00,claudecode,Claude Code 실무 최적화 마스터,300000,0,300000,,2026-05-17 03:00
+demoG_23@guest.test,문준서,guest,false,2026-05-08 10:00,book-aigap,AI 초격차 (도서),22000,0,22000,,2026-05-11 04:00
+demo_24@demo.seed,양소율,member,false,2026-05-27 23:00,proposal,AI 활용 제안서·기획서 마스터,240000,0,240000,,2026-05-28 10:00
+demo_25@demo.seed,배연우,member,true,2026-05-21 00:00,book-dify,노코드 AI와 Dify 시작하기 (도서),24000,0,24000,,2026-05-22 11:00
+demo_25@demo.seed,배연우,member,true,2026-05-21 00:00,proposal,AI 활용 제안서·기획서 마스터,240000,0,240000,,2026-05-24 05:00
+demo_26@demo.seed,백정우,member,false,2026-05-14 01:00,basic,비전공자를 위한 AI 기초 & 비즈니스 활용,180000,54000,126000,30%,2026-05-16 12:00
+demo_27@demo.seed,허지율,member,true,2026-06-03 02:00,,,,,,,
+demo_28@demo.seed,유승현,member,false,2026-05-27 03:00,,,,,,,
+demoG_29@guest.test,남예린,guest,false,2026-05-20 04:00,claudecode,Claude Code 실무 최적화 마스터,300000,0,300000,,2026-05-21 03:00
