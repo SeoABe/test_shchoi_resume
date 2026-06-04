@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <title>인사이트 — 최상훈 AX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oxygen:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Oxygen', sans-serif; font-size: 14px; line-height: 1.6; color: #6e777a; background: #f5f5f5; word-break: keep-all; }
+    a { color: inherit; text-decoration: none; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    button { font-family: inherit; cursor: pointer; }
+
+    :root { --black:#1e1e1e; --white:#fff; --gray-body:#6e777a; --gray-light:#f5f5f5; --border:#e0e0e0; --accent:#4f46e5; --green:#16a34a; --red:#dc2626; --amber:#d97706; }
+
+    #app { display: none; min-height: 100vh; grid-template-columns: 240px 1fr; }
+    #app.show { display: grid; }
+    .sidebar { background: var(--black); color: #fff; padding: 28px 0; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+    .sidebar-brand { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; padding: 0 28px 8px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-badge { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; background: var(--accent); padding: 3px 7px; text-transform: uppercase; }
+    .sidebar-sub { font-size: 11px; color: rgba(255,255,255,.35); padding: 0 28px 28px; letter-spacing: 1px; }
+    .nav-item { padding: 14px 28px; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,.55); border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.04); }
+    .nav-item.active { color: #fff; border-left-color: var(--accent); background: rgba(79,70,229,.12); }
+    .sidebar-foot { margin-top: auto; padding: 20px 28px 0; border-top: 1px solid rgba(255,255,255,.1); }
+    .sidebar-user { font-size: 12px; color: #fff; font-weight: 700; }
+    .sidebar-email { font-size: 10px; color: rgba(255,255,255,.4); margin-bottom: 12px; word-break: break-all; }
+    .sidebar-logout { font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.2); padding: 7px 14px; background: transparent; width: 100%; }
+    .sidebar-logout:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .sidebar-home { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 10px; display: block; }
+    .sidebar-home:hover { color: rgba(255,255,255,.6); }
+
+    .main { padding: 36px 40px; overflow-x: hidden; }
+    .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 8px; }
+    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 2px; color: var(--black); line-height: 1; }
+    .page-sub { font-size: 13px; color: var(--gray-body); margin-bottom: 28px; }
+    .btn-out { background:#fff; color:var(--black); border:1px solid var(--border); font-size:12px; font-weight:700; letter-spacing:1px; padding:9px 16px; }
+    .btn-out:hover { border-color: var(--black); }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .kpi { background: #fff; border: 1px solid var(--border); padding: 22px 24px; }
+    .kpi-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray-body); margin-bottom: 10px; }
+    .kpi-value { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 1px; color: var(--black); line-height: 1; }
+    .kpi-value .unit { font-size: 15px; color: var(--gray-body); margin-left: 3px; }
+    .kpi.accent .kpi-value { color: var(--accent); }
+    .kpi-sub { font-size: 11px; color: var(--gray-body); margin-top: 6px; }
+
+    .panel { background: #fff; border: 1px solid var(--border); margin-bottom: 24px; }
+    .panel-head { padding: 16px 24px; border-bottom: 1px solid var(--border); }
+    .panel-title { font-size: 14px; font-weight: 700; color: var(--black); letter-spacing: 1px; }
+    .panel-body { padding: 22px 24px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    /* bars */
+    .bar-row { display: flex; align-items: center; gap: 14px; padding: 8px 0; }
+    .bar-name { font-size: 13px; color: var(--black); min-width: 130px; }
+    .bar-name.sm { min-width: 44px; }
+    .bar-track { flex: 1; height: 14px; background: var(--gray-light); position: relative; border-radius: 2px; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width .6s ease; }
+    .bar-fill.alt { background: var(--black); }
+    .bar-fill.green { background: var(--green); }
+    .bar-val { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gray-body); min-width: 120px; text-align: right; }
+    .bar-val.sm { min-width: 70px; }
+
+    /* compare blocks */
+    .cmp { display: flex; gap: 16px; }
+    .cmp-box { flex: 1; background: var(--gray-light); border: 1px solid var(--border); padding: 18px; text-align: center; }
+    .cmp-box .big { font-family: 'Bebas Neue', sans-serif; font-size: 34px; color: var(--black); letter-spacing: 1px; line-height: 1; }
+    .cmp-box.hl .big { color: var(--accent); }
+    .cmp-box .lab { font-size: 11px; color: var(--gray-body); margin-top: 6px; letter-spacing: .5px; }
+
+    /* insight cards */
+    .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .insight { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 16px 18px; display: flex; gap: 12px; align-items: flex-start; }
+    .insight .ic { font-size: 20px; line-height: 1; flex-shrink: 0; }
+    .insight .tx { font-size: 13px; color: var(--black); line-height: 1.6; }
+    .insight .tx b { color: var(--accent); }
+    .insight.warn { border-left-color: var(--amber); }
+    .insight.warn .tx b { color: var(--amber); }
+    .insight.good { border-left-color: var(--green); }
+    .insight.good .tx b { color: var(--green); }
+
+    .empty { padding: 40px; text-align: center; color: var(--gray-body); font-size: 13px; }
+    .loading { padding: 60px; text-align: center; color: var(--gray-body); }
+    .note { font-size: 11px; color: var(--gray-body); margin-top: 10px; line-height: 1.6; }
+
+    /* gate */
+    #gate { display: flex; min-height: 100vh; align-items: center; justify-content: center; padding: 20px; }
+    #gate.hide { display: none; }
+    .gate-box { background: #fff; border: 1px solid var(--border); width: 380px; max-width: 100%; }
+    .gate-head { background: var(--black); padding: 28px; }
+    .gate-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: #fff; }
+    .gate-sub { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 4px; }
+    .gate-body { padding: 28px; }
+    .gate-msg { font-size: 13px; line-height: 1.7; color: var(--gray-body); text-align: center; padding: 12px 0 20px; }
+    .field { margin-bottom: 16px; }
+    .field label { display:block; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-body); margin-bottom: 6px; }
+    .field input { width: 100%; font-family: 'Oxygen'; font-size: 14px; color: var(--black); background: var(--gray-light); border: 1px solid var(--border); padding: 12px; outline: none; }
+    .field input:focus { border-color: var(--accent); }
+    .btn-accent { background: var(--accent); color: #fff; border: none; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 14px; width: 100%; }
+
+    @media (max-width: 820px) {
+      #app.show { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 16px; }
+      .sidebar-sub, .sidebar-foot { display: none; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .grid-2, .insight-grid { grid-template-columns: 1fr; }
+      .main { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- GATE -->
+  <div id="gate">
+    <div class="gate-box">
+      <div class="gate-head"><div class="gate-title">INSIGHTS</div><div class="gate-sub">최상훈 AX · 고객 인사이트</div></div>
+      <div class="gate-body" id="gateBody"><div class="loading">확인 중...</div></div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app">
+    <aside class="sidebar">
+      <div class="sidebar-brand">INSIGHTS <span class="sidebar-badge">최상훈 AX</span></div>
+      <div class="sidebar-sub">고객 인사이트 (Phase 1)</div>
+      <a class="nav-item" href="admin.html"><span>🗂️</span> 관리자 콘솔</a>
+      <div class="nav-item active"><span>📈</span> 인사이트</div>
+      <div class="sidebar-foot">
+        <div class="sidebar-user" id="sbUser">—</div>
+        <div class="sidebar-email" id="sbEmail">—</div>
+        <button class="sidebar-logout" onclick="logout()">로그아웃</button>
+        <a href="index.html" class="sidebar-home">← 사이트로 돌아가기</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <div class="page-title">고객 인사이트</div>
+        </div>
+        <button class="btn-out" onclick="reload()">🔄 새로고침</button>
+      </div>
+      <div class="page-sub">거래 데이터 기반 분석입니다. (방문·클릭 등 행동 트래킹은 Phase 2에서 추가됩니다)</div>
+
+      <!-- 자동 인사이트 -->
+      <div class="panel">
+        <div class="panel-head"><span class="panel-title">🤖 자동 인사이트</span></div>
+        <div class="panel-body"><div class="insight-grid" id="autoInsights"><div class="loading">분석 중...</div></div></div>
+      </div>
+
+      <!-- KPI -->
+      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <!-- 인기 상품 -->
+      <div class="panel">
+        <div class="panel-head"><span class="panel-title">상품별 판매 (조회 대비 구매는 Phase 2)</span></div>
+        <div class="panel-body" id="productStats"><div class="loading">불러오는 중...</div></div>
+      </div>
+
+      <!-- 세그먼트 -->
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">뉴스레터 구독 → 구매율</span></div>
+          <div class="panel-body" id="segNewsletter"><div class="loading">…</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">정회원 vs 빠른구매(게스트)</span></div>
+          <div class="panel-body" id="segGuest"><div class="loading">…</div></div>
+        </div>
+      </div>
+
+      <!-- 재구매 / 쿠폰 -->
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">신규 vs 재구매 고객</span></div>
+          <div class="panel-body" id="segRepeat"><div class="loading">…</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">쿠폰 효과</span></div>
+          <div class="panel-body" id="couponEffect"><div class="loading">…</div></div>
+        </div>
+      </div>
+
+      <!-- 시간 패턴 -->
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">요일별 구매</span></div>
+          <div class="panel-body" id="byWeekday"><div class="loading">…</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">시간대별 구매</span></div>
+          <div class="panel-body" id="byHour"><div class="loading">…</div></div>
+        </div>
+      </div>
+
+      <!-- 추이 -->
+      <div class="panel">
+        <div class="panel-head"><span class="panel-title">최근 14일 구매·가입 추이</span></div>
+        <div class="panel-body" id="trend"><div class="loading">…</div></div>
+      </div>
+    </main>
+  </div>
+
+
+  <script>
+    const SUPABASE_URL      = 'https://jjmxprpeheuqvkrcfjec.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqbXhwcnBlaGV1cXZrcmNmamVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwMzg4OTIsImV4cCI6MjA5NTYxNDg5Mn0.Klxjus9WzL6MS25umvKDwAr3Hk7SJClApUthRQgIMWs';
+    const SB_CONFIGURED = SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 30;
+    const sb = SB_CONFIGURED && window.supabase
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, lock: async (_n,_t,fn)=>await fn() } })
+      : null;
+
+    const COURSE_LABELS = {
+      basic:'비전공자 AI 기초', proposal:'AI 제안서·기획서 마스터', claudecode:'Claude Code 마스터', enterprise:'기업 AX 도입',
+      'book-aigap':'📘 AI 초격차', 'book-proposal':'📘 제안서 마스터(도서)', 'book-dify':'📘 Dify 시작하기',
+    };
+    const won = n => (n||0).toLocaleString('ko-KR') + '원';
+    const pct = (a,b) => b ? Math.round(a/b*1000)/10 : 0;
+    const esc = s => (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const isGuest = email => !!email && /@guest\.test$/i.test(email);
+    const isBookKey = k => (k||'').startsWith('book-');
+    const withTimeout = (p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
+
+    let DATA = { profiles:[], enrollments:[] };
+    let me = null;
+
+    async function boot() {
+      if (!SB_CONFIGURED) { gateMsg('백엔드 설정이 필요합니다.', false); return; }
+      let session=null;
+      try { const {data}=await withTimeout(sb.auth.getSession(),5000); session=data.session; } catch(e){}
+      if (!session) { renderLogin(); return; }
+      const { data: prof, error } = await sb.from('profiles').select('name,email,is_admin').eq('id', session.user.id).maybeSingle();
+      if (error) { gateMsg('프로필 조회 오류: '+error.message, true); return; }
+      if (!prof || !prof.is_admin) { gateMsg('<b>'+esc(session.user.email)+'</b> 계정은 관리자 권한이 없습니다.', true); return; }
+      me = { name: prof.name || session.user.email.split('@')[0], email: prof.email || session.user.email };
+      document.getElementById('gate').classList.add('hide');
+      document.getElementById('app').classList.add('show');
+      document.getElementById('sbUser').textContent = me.name + ' 님';
+      document.getElementById('sbEmail').textContent = me.email;
+      loadAll();
+    }
+    function renderLogin() {
+      document.getElementById('gateBody').innerHTML =
+        `<div class="field"><label>이메일</label><input id="gEmail" type="email" placeholder="admin@example.com"></div>
+         <div class="field"><label>비밀번호</label><input id="gPw" type="password" placeholder="••••••••"></div>
+         <div id="gErr" style="color:var(--red);font-size:12px;min-height:16px;margin-bottom:8px;"></div>
+         <button class="btn-accent" onclick="adminLogin(event)">로그인</button>
+         <a href="index.html" style="display:block;text-align:center;font-size:11px;color:var(--gray-body);margin-top:16px;">← 사이트로</a>`;
+    }
+    function gateMsg(html, withLogout) {
+      document.getElementById('gate').classList.remove('hide');
+      document.getElementById('app').classList.remove('show');
+      document.getElementById('gateBody').innerHTML = `<div class="gate-msg">${html}</div>` +
+        (withLogout ? `<button class="btn-out" style="width:100%" onclick="logout()">다른 계정으로 로그인</button>` : '') +
+        `<a href="index.html" style="display:block;text-align:center;font-size:11px;color:var(--gray-body);margin-top:16px;">← 사이트로</a>`;
+    }
+    async function adminLogin(e){
+      const email=document.getElementById('gEmail').value.trim(), pw=document.getElementById('gPw').value, err=document.getElementById('gErr'), btn=e.target;
+      if(!email||!pw){err.textContent='이메일과 비밀번호를 입력하세요.';return;}
+      btn.disabled=true; btn.textContent='로그인 중...';
+      const {error}=await sb.auth.signInWithPassword({email,password:pw});
+      btn.disabled=false; btn.textContent='로그인';
+      if(error){err.textContent='로그인 실패: 정보를 확인하세요.';return;}
+      boot();
+    }
+    async function logout(){ await sb.auth.signOut(); location.reload(); }
+    function reload(){ loadAll(); }
+
+    async function loadAll() {
+      const [p,e] = await Promise.all([
+        sb.from('profiles').select('id,name,email,newsletter_opt_in,is_admin,created_at'),
+        sb.from('enrollments').select('*').order('created_at',{ascending:true}),
+      ]);
+      DATA.profiles = p.data || [];
+      DATA.enrollments = e.data || [];
+      render();
+    }
+
+    /* ───── helpers for charts ───── */
+    function barRows(items, opt={}) {
+      // items: [{name, value, valText, cls}]
+      const max = Math.max(1, ...items.map(i=>i.value));
+      return items.map(i=>`<div class="bar-row">
+        <div class="bar-name ${opt.sm?'sm':''}">${esc(i.name)}</div>
+        <div class="bar-track"><div class="bar-fill ${i.cls||''}" style="width:${i.value/max*100}%"></div></div>
+        <div class="bar-val ${opt.sm?'sm':''}">${i.valText}</div></div>`).join('');
+    }
+    function cmp(boxes) { return `<div class="cmp">${boxes.map(b=>`<div class="cmp-box ${b.hl?'hl':''}"><div class="big">${b.big}</div><div class="lab">${esc(b.lab)}</div></div>`).join('')}</div>`; }
+
+    /* ───── main render ───── */
+    function render() {
+      const P = DATA.profiles, E = DATA.enrollments;
+      const members = P.length;
+      const revenue = E.reduce((s,x)=>s+(x.price||0),0);
+      const orders = E.length;
+      const buyers = new Set(E.map(x=>x.user_id));
+      const buyerCount = buyers.size;
+      const aov = orders ? Math.round(revenue/orders) : 0;
+      const subs = P.filter(p=>p.newsletter_opt_in);
+      const insights = [];
+
+      // KPI
+      document.getElementById('kpiGrid').innerHTML = [
+        {label:'누적 매출', val: won(revenue).replace('원','<span class="unit">원</span>'), accent:true},
+        {label:'결제 건수', val: orders+'<span class="unit">건</span>'},
+        {label:'평균 객단가', val: won(aov).replace('원','<span class="unit">원</span>')},
+        {label:'회원 수', val: members+'<span class="unit">명</span>'},
+        {label:'구매 전환율 (회원→구매)', val: pct(buyerCount,members)+'<span class="unit">%</span>', sub:`${buyerCount}/${members}명 구매`},
+        {label:'뉴스레터 구독률', val: pct(subs.length,members)+'<span class="unit">%</span>', sub:`${subs.length}/${members}명`},
+      ].map(k=>`<div class="kpi ${k.accent?'accent':''}"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.val}</div>${k.sub?`<div class="kpi-sub">${k.sub}</div>`:''}</div>`).join('');
+
+      // 상품별
+      const byCourse = {};
+      E.forEach(x=>{ const k=x.course_key||'기타'; (byCourse[k]=byCourse[k]||{c:0,r:0}); byCourse[k].c++; byCourse[k].r+=(x.price||0); });
+      const prodItems = Object.entries(byCourse).sort((a,b)=>b[1].c-a[1].c)
+        .map(([k,v])=>({name: COURSE_LABELS[k]||k, value:v.c, valText:`${v.c}건 · ${won(v.r)}`, cls: isBookKey(k)?'alt':''}));
+      document.getElementById('productStats').innerHTML = prodItems.length ? barRows(prodItems) : '<div class="empty">구매 데이터가 없습니다.</div>';
+
+      // 세그먼트: 뉴스레터
+      const subBuyers = subs.filter(p=>buyers.has(p.id)).length;
+      const nonSubs = P.filter(p=>!p.newsletter_opt_in);
+      const nonSubBuyers = nonSubs.filter(p=>buyers.has(p.id)).length;
+      const subRate = pct(subBuyers, subs.length), nonRate = pct(nonSubBuyers, nonSubs.length);
+      document.getElementById('segNewsletter').innerHTML = members ? cmp([
+        {big: subRate+'%', lab:`구독자 구매율 (${subBuyers}/${subs.length})`, hl:true},
+        {big: nonRate+'%', lab:`비구독자 구매율 (${nonSubBuyers}/${nonSubs.length})`},
+      ]) : '<div class="empty">회원이 없습니다.</div>';
+
+      // 세그먼트: 게스트 vs 정회원 (구매 건수 기준)
+      const guestOrders = E.filter(x=>{ const p=P.find(pp=>pp.id===x.user_id); return p && isGuest(p.email); }).length;
+      const memberOrders = orders - guestOrders;
+      document.getElementById('segGuest').innerHTML = orders ? cmp([
+        {big: memberOrders+'건', lab:`정회원 구매 (${pct(memberOrders,orders)}%)`, hl:true},
+        {big: guestOrders+'건', lab:`빠른구매 (${pct(guestOrders,orders)}%)`},
+      ]) : '<div class="empty">구매 데이터가 없습니다.</div>';
+
+      // 재구매
+      const ordersByUser = {}; E.forEach(x=>ordersByUser[x.user_id]=(ordersByUser[x.user_id]||0)+1);
+      const repeatBuyers = Object.values(ordersByUser).filter(n=>n>=2).length;
+      const onceBuyers = buyerCount - repeatBuyers;
+      document.getElementById('segRepeat').innerHTML = buyerCount ? cmp([
+        {big: onceBuyers+'명', lab:`1회 구매 (${pct(onceBuyers,buyerCount)}%)`},
+        {big: repeatBuyers+'명', lab:`재구매 (${pct(repeatBuyers,buyerCount)}%)`, hl:true},
+      ]) : '<div class="empty">구매 고객이 없습니다.</div>';
+
+      // 쿠폰 효과 (coupon_code 컬럼 없을 수 있음 → 안전 처리)
+      const withCoupon = E.filter(x=>x.coupon_code);
+      const noCoupon = E.filter(x=>!x.coupon_code);
+      const aovWith = withCoupon.length ? Math.round(withCoupon.reduce((s,x)=>s+(x.price||0),0)/withCoupon.length) : 0;
+      const aovNo = noCoupon.length ? Math.round(noCoupon.reduce((s,x)=>s+(x.price||0),0)/noCoupon.length) : 0;
+      const totalDisc = E.reduce((s,x)=>s+(x.discount||0),0);
+      document.getElementById('couponEffect').innerHTML = orders ? (
+        cmp([
+          {big: withCoupon.length+'건', lab:`쿠폰 사용 (${pct(withCoupon.length,orders)}%)`, hl:true},
+          {big: won(totalDisc), lab:'누적 할인액'},
+        ]) + `<div class="note">쿠폰 사용 객단가 ${won(aovWith)} · 미사용 ${won(aovNo)}${withCoupon.length===0?' — 아직 쿠폰 사용 내역이 없습니다.':''}</div>`
+      ) : '<div class="empty">구매 데이터가 없습니다.</div>';
+
+      // 요일별
+      const WD=['일','월','화','수','목','금','토'];
+      const byWd = Array(7).fill(0); E.forEach(x=>{ const d=new Date(x.created_at); if(!isNaN(d)) byWd[d.getDay()]++; });
+      document.getElementById('byWeekday').innerHTML = orders ? barRows(WD.map((w,i)=>({name:w, value:byWd[i], valText:byWd[i]+'건'})), {sm:true}) : '<div class="empty">데이터 없음</div>';
+
+      // 시간대별 (3시간 버킷)
+      const buckets=[[0,6],[6,9],[9,12],[12,15],[15,18],[18,21],[21,24]];
+      const bv=buckets.map(()=>0); E.forEach(x=>{ const d=new Date(x.created_at); if(isNaN(d))return; const h=d.getHours(); buckets.forEach((b,i)=>{ if(h>=b[0]&&h<b[1]) bv[i]++; }); });
+      document.getElementById('byHour').innerHTML = orders ? barRows(buckets.map((b,i)=>({name:`${b[0]}-${b[1]}시`, value:bv[i], valText:bv[i]+'건'})), {sm:true}) : '<div class="empty">데이터 없음</div>';
+
+      // 추이 (최근 14일)
+      const days=[]; const today=new Date(); today.setHours(0,0,0,0);
+      for(let i=13;i>=0;i--){ const d=new Date(today); d.setDate(d.getDate()-i); days.push(d); }
+      const key=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+      const buyByDay={}, joinByDay={};
+      E.forEach(x=>{ const d=new Date(x.created_at); if(!isNaN(d)){d.setHours(0,0,0,0); buyByDay[key(d)]=(buyByDay[key(d)]||0)+1;} });
+      P.forEach(p=>{ const d=new Date(p.created_at); if(!isNaN(d)){d.setHours(0,0,0,0); joinByDay[key(d)]=(joinByDay[key(d)]||0)+1;} });
+      const trendItems = days.map(d=>({ name:(d.getMonth()+1)+'/'+d.getDate(), buy:buyByDay[key(d)]||0, join:joinByDay[key(d)]||0 }));
+      const tmax = Math.max(1, ...trendItems.map(t=>Math.max(t.buy,t.join)));
+      document.getElementById('trend').innerHTML =
+        `<div style="display:flex;gap:6px;align-items:flex-end;height:160px;">` +
+        trendItems.map(t=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;justify-content:flex-end;">
+            <div style="width:100%;display:flex;gap:2px;align-items:flex-end;justify-content:center;height:130px;">
+              <div title="구매 ${t.buy}" style="width:40%;background:var(--accent);height:${t.buy/tmax*100}%;min-height:${t.buy?'3px':'0'};"></div>
+              <div title="가입 ${t.join}" style="width:40%;background:#cbd5e1;height:${t.join/tmax*100}%;min-height:${t.join?'3px':'0'};"></div>
+            </div>
+            <div style="font-size:9px;color:var(--gray-body);" class="mono">${t.name}</div>
+          </div>`).join('') + `</div>
+          <div class="note"><span style="color:var(--accent);">■</span> 구매 &nbsp; <span style="color:#cbd5e1;">■</span> 가입</div>`;
+
+      /* ───── 자동 인사이트 도출 ───── */
+      if (members) insights.push({ic:'🎯', cls:'', tx:`회원 <b>${members}명</b> 중 <b>${buyerCount}명</b>이 구매 — 전환율 <b>${pct(buyerCount,members)}%</b>`});
+      if (prodItems.length) insights.push({ic:'🏆', cls:'good', tx:`가장 많이 팔린 상품은 <b>${esc(prodItems[0].name)}</b> (${byCourse[Object.entries(byCourse).sort((a,b)=>b[1].c-a[1].c)[0][0]].c}건)`});
+      if (subs.length && nonSubs.length) {
+        if (subRate > nonRate && nonRate>0) insights.push({ic:'📧', cls:'good', tx:`뉴스레터 구독자 구매율(<b>${subRate}%</b>)이 비구독자(<b>${nonRate}%</b>)의 <b>${(subRate/Math.max(nonRate,0.1)).toFixed(1)}배</b> — 구독 유도가 효과적`});
+        else if (subRate > nonRate) insights.push({ic:'📧', cls:'good', tx:`뉴스레터 구독자 구매율 <b>${subRate}%</b> — 구독자가 핵심 구매층`});
+        else if (nonRate > subRate) insights.push({ic:'📧', cls:'warn', tx:`비구독자 구매율(<b>${nonRate}%</b>)이 구독자(<b>${subRate}%</b>)보다 높음 — 뉴스레터 콘텐츠 점검 필요`});
+        else insights.push({ic:'📧', cls:'', tx:`구독자·비구독자 구매율이 <b>${subRate}%</b>로 비슷 — 뉴스레터 외 유입 요인 분석 필요`});
+      }
+      if (buyerCount) insights.push({ic:'🔁', cls: repeatBuyers? 'good':'warn', tx: repeatBuyers ? `재구매 고객 <b>${repeatBuyers}명</b> (구매자의 <b>${pct(repeatBuyers,buyerCount)}%</b>)` : `재구매 고객이 아직 없습니다 — 후속 강좌·도서 교차 추천 기회`});
+      if (orders && guestOrders) insights.push({ic:'⚡', cls:'', tx:`구매의 <b>${pct(guestOrders,orders)}%</b>가 빠른구매(게스트) — 정회원 전환 유도 여지`});
+      if (orders) { const bookOrders=E.filter(x=>isBookKey(x.course_key)).length; if(bookOrders) insights.push({ic:'📚', cls:'', tx:`전체 주문의 <b>${pct(bookOrders,orders)}%</b>가 도서 — 강좌와 묶음 제안 가능`}); }
+      if (orders>=3) { const peak=byWd.indexOf(Math.max(...byWd)); insights.push({ic:'🕒', cls:'', tx:`구매가 가장 많은 요일은 <b>${WD[peak]}요일</b> — 프로모션·발송 타이밍 참고`}); }
+      if (withCoupon.length) insights.push({ic:'🎟️', cls:'', tx:`쿠폰 사용 주문 <b>${withCoupon.length}건</b>, 누적 할인 <b>${won(totalDisc)}</b>`});
+      if (!orders) insights.unshift({ic:'ℹ️', cls:'warn', tx:`아직 구매 데이터가 없습니다. 구매가 쌓이면 인사이트가 자동으로 채워집니다.`});
+
+      document.getElementById('autoInsights').innerHTML = insights.map(i=>
+        `<div class="insight ${i.cls}"><span class="ic">${i.ic}</span><span class="tx">${i.tx}</span></div>`).join('');
+    }
+
+    boot();
+  </script>
+</body>
+</html>
