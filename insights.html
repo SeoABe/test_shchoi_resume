@@ -85,6 +85,40 @@
     .insight.good { border-left-color: var(--green); }
     .insight.good .tx b { color: var(--green); }
 
+    /* 인사이트 그룹 */
+    .ins-group { margin-bottom: 20px; }
+    .ins-group:last-child { margin-bottom: 0; }
+    .ins-group-head { display: flex; align-items: center; gap: 8px; padding: 0 0 8px; margin-bottom: 12px; border-bottom: 2px solid var(--border); }
+    .ins-group-head .gt { font-size: 13px; font-weight: 700; letter-spacing: .5px; }
+    .ins-group-head .gd { font-size: 11px; color: var(--gray-body); }
+    .ins-group.positive .ins-group-head { border-bottom-color: var(--green); }
+    .ins-group.positive .gt { color: var(--green); }
+    .ins-group.watch .ins-group-head { border-bottom-color: var(--accent); }
+    .ins-group.watch .gt { color: var(--accent); }
+    .ins-group.risk .ins-group-head { border-bottom-color: var(--amber); }
+    .ins-group.risk .gt { color: var(--amber); }
+
+    /* 도넛 차트 영역 */
+    .donut-wrap { display: flex; gap: 24px; justify-content: space-around; align-items: center; flex-wrap: wrap; }
+    .donut-unit { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .donut-cap { font-size: 12px; color: var(--gray-body); text-align: center; }
+    .donut-legend { display: flex; flex-direction: column; gap: 8px; }
+    .donut-legend .lg { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--black); }
+    .donut-legend .dot { width: 11px; height: 11px; border-radius: 2px; flex-shrink: 0; }
+
+    /* 상품별 판매 테이블 (건수 + 금액 분리) */
+    .prod-table { width: 100%; border-collapse: collapse; }
+    .prod-table th { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gray-body); text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--black); }
+    .prod-table th.r, .prod-table td.r { text-align: right; }
+    .prod-table td { padding: 10px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--black); vertical-align: middle; }
+    .prod-name { font-weight: 700; white-space: nowrap; }
+    .pbar { display: flex; align-items: center; gap: 8px; }
+    .pbar-track { flex: 1; height: 12px; background: var(--gray-light); border-radius: 2px; overflow: hidden; min-width: 60px; }
+    .pbar-fill { height: 100%; border-radius: 2px; }
+    .pbar-fill.cnt { background: var(--accent); }
+    .pbar-fill.amt { background: var(--black); }
+    .pbar-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--black); min-width: 92px; text-align: right; }
+
     .empty { padding: 40px; text-align: center; color: var(--gray-body); font-size: 13px; }
     .loading { padding: 60px; text-align: center; color: var(--gray-body); }
     .note { font-size: 11px; color: var(--gray-body); margin-top: 10px; line-height: 1.6; }
@@ -154,7 +188,7 @@
       <!-- 자동 인사이트 -->
       <div class="panel">
         <div class="panel-head"><span class="panel-title">🤖 자동 인사이트</span></div>
-        <div class="panel-body"><div class="insight-grid" id="autoInsights"><div class="loading">분석 중...</div></div></div>
+        <div class="panel-body"><div id="autoInsights"><div class="loading">분석 중...</div></div></div>
       </div>
 
       <!-- KPI -->
@@ -313,6 +347,57 @@
     }
     function cmp(boxes) { return `<div class="cmp">${boxes.map(b=>`<div class="cmp-box ${b.hl?'hl':''}"><div class="big">${b.big}</div><div class="lab">${esc(b.lab)}</div></div>`).join('')}</div>`; }
 
+    const C = { accent:'#4f46e5', green:'#16a34a', amber:'#d97706', gray:'#cbd5e1', black:'#1e1e1e', red:'#dc2626' };
+
+    // 단일 비율 도넛 (게이지)
+    function donutPct(percent, color, centerSub, caption) {
+      const r=42, circ=2*Math.PI*r, off=circ*(1-Math.min(percent,100)/100);
+      return `<div class="donut-unit">
+        <svg width="118" height="118" viewBox="0 0 118 118">
+          <circle cx="59" cy="59" r="${r}" fill="none" stroke="#eef0f4" stroke-width="13"/>
+          <circle cx="59" cy="59" r="${r}" fill="none" stroke="${color}" stroke-width="13" stroke-linecap="round"
+            stroke-dasharray="${circ}" stroke-dashoffset="${off}" transform="rotate(-90 59 59)"/>
+          <text x="59" y="56" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="28" fill="${C.black}">${percent}%</text>
+          <text x="59" y="74" text-anchor="middle" font-size="9" fill="#8c7a68">${esc(centerSub||'')}</text>
+        </svg>
+        <div class="donut-cap">${caption||''}</div>
+      </div>`;
+    }
+    // 2~n분할 도넛(파이) + 범례
+    function donutSplit(parts, centerLabel) { // parts:[{label,value,color}]
+      const total = parts.reduce((s,p)=>s+p.value,0) || 1;
+      const r=42, circ=2*Math.PI*r; let acc=0;
+      const segs = parts.map(p=>{ const frac=p.value/total; const seg=`${circ*frac} ${circ*(1-frac)}`; const off=-circ*acc; acc+=frac;
+        return `<circle cx="59" cy="59" r="${r}" fill="none" stroke="${p.color}" stroke-width="18" stroke-dasharray="${seg}" stroke-dashoffset="${off}" transform="rotate(-90 59 59)"/>`; }).join('');
+      const legend = parts.map(p=>`<div class="lg"><span class="dot" style="background:${p.color}"></span>${esc(p.label)} <b style="margin-left:auto;padding-left:10px;">${p.value} (${pct(p.value,total)}%)</b></div>`).join('');
+      return `<div class="donut-wrap">
+        <svg width="118" height="118" viewBox="0 0 118 118">${segs}
+          <text x="59" y="63" text-anchor="middle" font-size="11" fill="#8c7a68">${esc(centerLabel||'')}</text></svg>
+        <div class="donut-legend" style="min-width:160px;">${legend}</div>
+      </div>`;
+    }
+    // 꺾은선 그래프 (2 시리즈)
+    function lineChart(labels, sA, sB, legA, legB) {
+      const W=620, H=180, padL=28, padR=12, padT=14, padB=24;
+      const n=labels.length, max=Math.max(1, ...sA, ...sB);
+      const xx=i=> padL + (n<=1?0:i*(W-padL-padR)/(n-1));
+      const yy=v=> padT + (1-v/max)*(H-padT-padB);
+      const path=s=> s.map((v,i)=>`${i?'L':'M'}${xx(i).toFixed(1)} ${yy(v).toFixed(1)}`).join(' ');
+      const dots=(s,col)=> s.map((v,i)=>`<circle cx="${xx(i).toFixed(1)}" cy="${yy(v).toFixed(1)}" r="3" fill="${col}"><title>${labels[i]} · ${v}</title></circle>`).join('');
+      // y 격자 (0, mid, max)
+      const grid=[0,Math.round(max/2),max].map(v=>`<line x1="${padL}" y1="${yy(v).toFixed(1)}" x2="${W-padR}" y2="${yy(v).toFixed(1)}" stroke="#eef0f4"/><text x="${padL-4}" y="${(yy(v)+3).toFixed(1)}" text-anchor="end" font-size="9" fill="#aaa">${v}</text>`).join('');
+      // x 라벨 (격자 줄여서 일부만)
+      const step=Math.ceil(n/7);
+      const xlab=labels.map((l,i)=> i%step===0 ? `<text x="${xx(i).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9" fill="#888" font-family="'JetBrains Mono',monospace">${l}</text>`:'').join('');
+      return `<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="display:block;">
+        ${grid}
+        <path d="${path(sA)}" fill="none" stroke="${C.gray}" stroke-width="2.5"/>
+        <path d="${path(sB)}" fill="none" stroke="${C.accent}" stroke-width="2.5"/>
+        ${dots(sA,C.gray)}${dots(sB,C.accent)}${xlab}
+      </svg>
+      <div class="note"><span style="color:${C.gray}">●</span> ${legA} &nbsp;&nbsp; <span style="color:${C.accent}">●</span> ${legB}</div>`;
+    }
+
     /* ───── main render ───── */
     function render() {
       const P = DATA.profiles, E = DATA.enrollments;
@@ -335,51 +420,63 @@
         {label:'뉴스레터 구독률', val: pct(subs.length,members)+'<span class="unit">%</span>', sub:`${subs.length}/${members}명`},
       ].map(k=>`<div class="kpi ${k.accent?'accent':''}"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.val}</div>${k.sub?`<div class="kpi-sub">${k.sub}</div>`:''}</div>`).join('');
 
-      // 상품별
+      // 상품별 (건수 / 매출 분리)
       const byCourse = {};
       E.forEach(x=>{ const k=x.course_key||'기타'; (byCourse[k]=byCourse[k]||{c:0,r:0}); byCourse[k].c++; byCourse[k].r+=(x.price||0); });
-      const prodItems = Object.entries(byCourse).sort((a,b)=>b[1].c-a[1].c)
-        .map(([k,v])=>({name: COURSE_LABELS[k]||k, value:v.c, valText:`${v.c}건 · ${won(v.r)}`, cls: isBookKey(k)?'alt':''}));
-      document.getElementById('productStats').innerHTML = prodItems.length ? barRows(prodItems) : '<div class="empty">구매 데이터가 없습니다.</div>';
+      const prodSorted = Object.entries(byCourse).sort((a,b)=>b[1].r-a[1].r);
+      const topByCount = Object.entries(byCourse).sort((a,b)=>b[1].c-a[1].c)[0];
+      const maxC = Math.max(1, ...prodSorted.map(([,v])=>v.c));
+      const maxR = Math.max(1, ...prodSorted.map(([,v])=>v.r));
+      document.getElementById('productStats').innerHTML = prodSorted.length ? `
+        <table class="prod-table">
+          <thead><tr><th>상품</th><th>판매 건수</th><th>매출액</th></tr></thead>
+          <tbody>${prodSorted.map(([k,v])=>`<tr>
+            <td class="prod-name">${esc(COURSE_LABELS[k]||k)}</td>
+            <td><div class="pbar"><div class="pbar-track"><div class="pbar-fill cnt" style="width:${v.c/maxC*100}%"></div></div><div class="pbar-val">${v.c}건</div></div></td>
+            <td><div class="pbar"><div class="pbar-track"><div class="pbar-fill amt" style="width:${v.r/maxR*100}%"></div></div><div class="pbar-val">${won(v.r)}</div></div></td>
+          </tr>`).join('')}</tbody>
+        </table>
+        <div class="note"><span style="color:var(--accent)">■</span> 판매 건수 &nbsp;&nbsp; <span style="color:var(--black)">■</span> 매출액</div>` : '<div class="empty">구매 데이터가 없습니다.</div>';
 
-      // 세그먼트: 뉴스레터
+      // 세그먼트: 뉴스레터 (두 비율 도넛 게이지)
       const subBuyers = subs.filter(p=>buyers.has(p.id)).length;
       const nonSubs = P.filter(p=>!p.newsletter_opt_in);
       const nonSubBuyers = nonSubs.filter(p=>buyers.has(p.id)).length;
       const subRate = pct(subBuyers, subs.length), nonRate = pct(nonSubBuyers, nonSubs.length);
-      document.getElementById('segNewsletter').innerHTML = members ? cmp([
-        {big: subRate+'%', lab:`구독자 구매율 (${subBuyers}/${subs.length})`, hl:true},
-        {big: nonRate+'%', lab:`비구독자 구매율 (${nonSubBuyers}/${nonSubs.length})`},
-      ]) : '<div class="empty">회원이 없습니다.</div>';
+      document.getElementById('segNewsletter').innerHTML = members ? `<div class="donut-wrap">
+        ${donutPct(subRate, C.green, `${subBuyers}/${subs.length}명`, '구독자 구매율')}
+        ${donutPct(nonRate, C.gray, `${nonSubBuyers}/${nonSubs.length}명`, '비구독자 구매율')}
+      </div>` : '<div class="empty">회원이 없습니다.</div>';
 
-      // 세그먼트: 게스트 vs 정회원 (구매 건수 기준)
+      // 세그먼트: 게스트 vs 정회원 (구매 건수 도넛)
       const guestOrders = E.filter(x=>{ const p=P.find(pp=>pp.id===x.user_id); return p && isGuest(p.email); }).length;
       const memberOrders = orders - guestOrders;
-      document.getElementById('segGuest').innerHTML = orders ? cmp([
-        {big: memberOrders+'건', lab:`정회원 구매 (${pct(memberOrders,orders)}%)`, hl:true},
-        {big: guestOrders+'건', lab:`빠른구매 (${pct(guestOrders,orders)}%)`},
-      ]) : '<div class="empty">구매 데이터가 없습니다.</div>';
+      document.getElementById('segGuest').innerHTML = orders ? donutSplit([
+        {label:'정회원', value:memberOrders, color:C.accent},
+        {label:'빠른구매(게스트)', value:guestOrders, color:C.amber},
+      ], `${orders}건`) : '<div class="empty">구매 데이터가 없습니다.</div>';
 
-      // 재구매
+      // 재구매 (도넛)
       const ordersByUser = {}; E.forEach(x=>ordersByUser[x.user_id]=(ordersByUser[x.user_id]||0)+1);
       const repeatBuyers = Object.values(ordersByUser).filter(n=>n>=2).length;
       const onceBuyers = buyerCount - repeatBuyers;
-      document.getElementById('segRepeat').innerHTML = buyerCount ? cmp([
-        {big: onceBuyers+'명', lab:`1회 구매 (${pct(onceBuyers,buyerCount)}%)`},
-        {big: repeatBuyers+'명', lab:`재구매 (${pct(repeatBuyers,buyerCount)}%)`, hl:true},
-      ]) : '<div class="empty">구매 고객이 없습니다.</div>';
+      document.getElementById('segRepeat').innerHTML = buyerCount ? donutSplit([
+        {label:'1회 구매', value:onceBuyers, color:C.gray},
+        {label:'재구매', value:repeatBuyers, color:C.green},
+      ], `${buyerCount}명`) : '<div class="empty">구매 고객이 없습니다.</div>';
 
-      // 쿠폰 효과 (coupon_code 컬럼 없을 수 있음 → 안전 처리)
+      // 쿠폰 효과 (도넛 + 요약)
       const withCoupon = E.filter(x=>x.coupon_code);
       const noCoupon = E.filter(x=>!x.coupon_code);
       const aovWith = withCoupon.length ? Math.round(withCoupon.reduce((s,x)=>s+(x.price||0),0)/withCoupon.length) : 0;
       const aovNo = noCoupon.length ? Math.round(noCoupon.reduce((s,x)=>s+(x.price||0),0)/noCoupon.length) : 0;
       const totalDisc = E.reduce((s,x)=>s+(x.discount||0),0);
       document.getElementById('couponEffect').innerHTML = orders ? (
-        cmp([
-          {big: withCoupon.length+'건', lab:`쿠폰 사용 (${pct(withCoupon.length,orders)}%)`, hl:true},
-          {big: won(totalDisc), lab:'누적 할인액'},
-        ]) + `<div class="note">쿠폰 사용 객단가 ${won(aovWith)} · 미사용 ${won(aovNo)}${withCoupon.length===0?' — 아직 쿠폰 사용 내역이 없습니다.':''}</div>`
+        donutSplit([
+          {label:'쿠폰 사용', value:withCoupon.length, color:C.accent},
+          {label:'미사용', value:noCoupon.length, color:C.gray},
+        ], `${orders}건`) +
+        `<div class="note">누적 할인 <b>${won(totalDisc)}</b> · 쿠폰 객단가 ${won(aovWith)} vs 미사용 ${won(aovNo)}${withCoupon.length===0?' — 아직 쿠폰 사용 내역이 없습니다.':''}</div>`
       ) : '<div class="empty">구매 데이터가 없습니다.</div>';
 
       // 요일별
@@ -399,37 +496,44 @@
       const buyByDay={}, joinByDay={};
       E.forEach(x=>{ const d=new Date(x.created_at); if(!isNaN(d)){d.setHours(0,0,0,0); buyByDay[key(d)]=(buyByDay[key(d)]||0)+1;} });
       P.forEach(p=>{ const d=new Date(p.created_at); if(!isNaN(d)){d.setHours(0,0,0,0); joinByDay[key(d)]=(joinByDay[key(d)]||0)+1;} });
-      const trendItems = days.map(d=>({ name:(d.getMonth()+1)+'/'+d.getDate(), buy:buyByDay[key(d)]||0, join:joinByDay[key(d)]||0 }));
-      const tmax = Math.max(1, ...trendItems.map(t=>Math.max(t.buy,t.join)));
-      document.getElementById('trend').innerHTML =
-        `<div style="display:flex;gap:6px;align-items:flex-end;height:160px;">` +
-        trendItems.map(t=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;justify-content:flex-end;">
-            <div style="width:100%;display:flex;gap:2px;align-items:flex-end;justify-content:center;height:130px;">
-              <div title="구매 ${t.buy}" style="width:40%;background:var(--accent);height:${t.buy/tmax*100}%;min-height:${t.buy?'3px':'0'};"></div>
-              <div title="가입 ${t.join}" style="width:40%;background:#cbd5e1;height:${t.join/tmax*100}%;min-height:${t.join?'3px':'0'};"></div>
-            </div>
-            <div style="font-size:9px;color:var(--gray-body);" class="mono">${t.name}</div>
-          </div>`).join('') + `</div>
-          <div class="note"><span style="color:var(--accent);">■</span> 구매 &nbsp; <span style="color:#cbd5e1;">■</span> 가입</div>`;
+      const labels = days.map(d=>(d.getMonth()+1)+'/'+d.getDate());
+      const joinSeries = days.map(d=>joinByDay[key(d)]||0);
+      const buySeries  = days.map(d=>buyByDay[key(d)]||0);
+      document.getElementById('trend').innerHTML = lineChart(labels, joinSeries, buySeries, '가입', '구매');
 
-      /* ───── 자동 인사이트 도출 ───── */
-      if (members) insights.push({ic:'🎯', cls:'', tx:`회원 <b>${members}명</b> 중 <b>${buyerCount}명</b>이 구매 — 전환율 <b>${pct(buyerCount,members)}%</b>`});
-      if (prodItems.length) insights.push({ic:'🏆', cls:'good', tx:`가장 많이 팔린 상품은 <b>${esc(prodItems[0].name)}</b> (${byCourse[Object.entries(byCourse).sort((a,b)=>b[1].c-a[1].c)[0][0]].c}건)`});
+      /* ───── 자동 인사이트 도출 (g: positive=긍정 / watch=분석필요 / risk=위험) ───── */
+      const convRate = pct(buyerCount, members);
+      if (members) insights.push({ic:'🎯', g: convRate>=50?'positive':'watch', tx:`회원 <b>${members}명</b> 중 <b>${buyerCount}명</b>이 구매 — 전환율 <b>${convRate}%</b>`});
+      if (topByCount) insights.push({ic:'🏆', g:'positive', tx:`가장 많이 팔린 상품은 <b>${esc(COURSE_LABELS[topByCount[0]]||topByCount[0])}</b> (${topByCount[1].c}건)`});
       if (subs.length && nonSubs.length) {
-        if (subRate > nonRate && nonRate>0) insights.push({ic:'📧', cls:'good', tx:`뉴스레터 구독자 구매율(<b>${subRate}%</b>)이 비구독자(<b>${nonRate}%</b>)의 <b>${(subRate/Math.max(nonRate,0.1)).toFixed(1)}배</b> — 구독 유도가 효과적`});
-        else if (subRate > nonRate) insights.push({ic:'📧', cls:'good', tx:`뉴스레터 구독자 구매율 <b>${subRate}%</b> — 구독자가 핵심 구매층`});
-        else if (nonRate > subRate) insights.push({ic:'📧', cls:'warn', tx:`비구독자 구매율(<b>${nonRate}%</b>)이 구독자(<b>${subRate}%</b>)보다 높음 — 뉴스레터 콘텐츠 점검 필요`});
-        else insights.push({ic:'📧', cls:'', tx:`구독자·비구독자 구매율이 <b>${subRate}%</b>로 비슷 — 뉴스레터 외 유입 요인 분석 필요`});
+        if (subRate > nonRate && nonRate>0) insights.push({ic:'📧', g:'positive', tx:`뉴스레터 구독자 구매율(<b>${subRate}%</b>)이 비구독자(<b>${nonRate}%</b>)의 <b>${(subRate/Math.max(nonRate,0.1)).toFixed(1)}배</b> — 구독 유도가 효과적`});
+        else if (subRate > nonRate) insights.push({ic:'📧', g:'positive', tx:`뉴스레터 구독자 구매율 <b>${subRate}%</b> — 구독자가 핵심 구매층`});
+        else if (nonRate > subRate) insights.push({ic:'📧', g:'risk', tx:`비구독자 구매율(<b>${nonRate}%</b>)이 구독자(<b>${subRate}%</b>)보다 높음 — 뉴스레터 콘텐츠 점검 필요`});
+        else insights.push({ic:'📧', g:'watch', tx:`구독자·비구독자 구매율이 <b>${subRate}%</b>로 비슷 — 뉴스레터 외 유입 요인 분석 필요`});
       }
-      if (buyerCount) insights.push({ic:'🔁', cls: repeatBuyers? 'good':'warn', tx: repeatBuyers ? `재구매 고객 <b>${repeatBuyers}명</b> (구매자의 <b>${pct(repeatBuyers,buyerCount)}%</b>)` : `재구매 고객이 아직 없습니다 — 후속 강좌·도서 교차 추천 기회`});
-      if (orders && guestOrders) insights.push({ic:'⚡', cls:'', tx:`구매의 <b>${pct(guestOrders,orders)}%</b>가 빠른구매(게스트) — 정회원 전환 유도 여지`});
-      if (orders) { const bookOrders=E.filter(x=>isBookKey(x.course_key)).length; if(bookOrders) insights.push({ic:'📚', cls:'', tx:`전체 주문의 <b>${pct(bookOrders,orders)}%</b>가 도서 — 강좌와 묶음 제안 가능`}); }
-      if (orders>=3) { const peak=byWd.indexOf(Math.max(...byWd)); insights.push({ic:'🕒', cls:'', tx:`구매가 가장 많은 요일은 <b>${WD[peak]}요일</b> — 프로모션·발송 타이밍 참고`}); }
-      if (withCoupon.length) insights.push({ic:'🎟️', cls:'', tx:`쿠폰 사용 주문 <b>${withCoupon.length}건</b>, 누적 할인 <b>${won(totalDisc)}</b>`});
-      if (!orders) insights.unshift({ic:'ℹ️', cls:'warn', tx:`아직 구매 데이터가 없습니다. 구매가 쌓이면 인사이트가 자동으로 채워집니다.`});
+      if (buyerCount) insights.push(repeatBuyers
+        ? {ic:'🔁', g:'positive', tx:`재구매 고객 <b>${repeatBuyers}명</b> (구매자의 <b>${pct(repeatBuyers,buyerCount)}%</b>) — 충성 고객 확보`}
+        : {ic:'🔁', g:'risk', tx:`재구매 고객이 아직 없습니다 — 후속 강좌·도서 교차 추천 기회`});
+      if (orders && guestOrders) insights.push({ic:'⚡', g:'watch', tx:`구매의 <b>${pct(guestOrders,orders)}%</b>가 빠른구매(게스트) — 정회원 전환 유도 여지`});
+      if (orders) { const bookOrders=E.filter(x=>isBookKey(x.course_key)).length; if(bookOrders) insights.push({ic:'📚', g:'watch', tx:`전체 주문의 <b>${pct(bookOrders,orders)}%</b>가 도서 — 강좌와 묶음 제안 가능`}); }
+      if (orders>=3) { const peak=byWd.indexOf(Math.max(...byWd)); insights.push({ic:'🕒', g:'watch', tx:`구매가 가장 많은 요일은 <b>${WD[peak]}요일</b> — 프로모션·발송 타이밍 참고`}); }
+      if (withCoupon.length) insights.push({ic:'🎟️', g:'positive', tx:`쿠폰 사용 주문 <b>${withCoupon.length}건</b>, 누적 할인 <b>${won(totalDisc)}</b> — 프로모션 반응 확인`});
+      if (!orders) insights.push({ic:'ℹ️', g:'risk', tx:`아직 구매 데이터가 없습니다. 구매가 쌓이면 인사이트가 자동으로 채워집니다.`});
 
-      document.getElementById('autoInsights').innerHTML = insights.map(i=>
-        `<div class="insight ${i.cls}"><span class="ic">${i.ic}</span><span class="tx">${i.tx}</span></div>`).join('');
+      const GROUPS = [
+        {key:'positive', icon:'✅', title:'긍정 신호', desc:'잘 작동하고 있는 부분'},
+        {key:'watch',    icon:'🔍', title:'분석 필요', desc:'더 살펴볼 지점'},
+        {key:'risk',     icon:'⚠️', title:'위험 신호', desc:'개선이 필요한 부분'},
+      ];
+      document.getElementById('autoInsights').innerHTML = GROUPS.map(grp=>{
+        const items = insights.filter(i=>i.g===grp.key);
+        if(!items.length) return '';
+        const cardCls = grp.key==='positive'?'good':(grp.key==='risk'?'warn':'');
+        return `<div class="ins-group ${grp.key}">
+          <div class="ins-group-head"><span>${grp.icon}</span><span class="gt">${grp.title}</span><span class="gd">· ${grp.desc}</span><span style="margin-left:auto;font-size:11px;color:var(--gray-body);">${items.length}건</span></div>
+          <div class="insight-grid">${items.map(i=>`<div class="insight ${cardCls}"><span class="ic">${i.ic}</span><span class="tx">${i.tx}</span></div>`).join('')}</div>
+        </div>`;
+      }).join('') || '<div class="empty">분석할 데이터가 없습니다.</div>';
     }
 
     boot();

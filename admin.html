@@ -67,8 +67,11 @@
     /* ══ TABLE ══ */
     table.tbl { width: 100%; border-collapse: collapse; }
     table.tbl th { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray-body); text-align: left; padding: 12px 16px; border-bottom: 2px solid var(--black); white-space: nowrap; }
-    table.tbl td { font-size: 13px; color: var(--black); padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    table.tbl td { font-size: 13px; color: var(--black); padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    table.tbl th.r, table.tbl td.r { text-align: right; }
+    table.tbl thead th { background: var(--gray-light); }
     table.tbl tr:hover td { background: #fafafa; }
+    .no { color: #c8c8c8; }
     .pill { font-size: 10px; font-weight: 700; letter-spacing: .5px; padding: 3px 9px; border-radius: 2px; display: inline-block; }
     .pill.green { background: #dcfce7; color: var(--green); }
     .pill.amber { background: #fef3c7; color: var(--amber); }
@@ -194,6 +197,11 @@
           <div class="kpi"><div class="kpi-label">총 신청 건수</div><div class="kpi-value" id="kpiEnrolls">—</div></div>
           <div class="kpi"><div class="kpi-label">총 회원 수</div><div class="kpi-value" id="kpiMembers">—</div></div>
           <div class="kpi"><div class="kpi-label">뉴스레터 구독자</div><div class="kpi-value" id="kpiSubs">—</div></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">신청 추이 (일별 · 누적)</span></div>
+          <div class="panel-body" id="trendCombo"><div class="loading">불러오는 중...</div></div>
         </div>
 
         <div class="panel">
@@ -461,21 +469,65 @@
           <div class="course-bar-val">${byCourse[k].count}건 · ${won(byCourse[k].rev)}</div>
         </div>`).join('') : '<div class="empty">아직 신청 내역이 없습니다.</div>';
 
-      // 최근 신청
+      // 신청 추이 (일별 막대 + 누적 선)
+      renderTrendCombo(en);
+
+      // 최근 신청 (열 명확화)
       const re = document.getElementById('recentEnrolls');
-      const rows = en.slice(0, 10);
+      const rows = en.slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0, 12);
       re.innerHTML = rows.length ? `<table class="tbl">
-        <thead><tr><th>일시</th><th>신청자</th><th>강좌</th><th>금액</th><th>상태</th></tr></thead>
+        <thead><tr><th style="width:96px;">신청일시</th><th>신청자</th><th>상품</th><th class="r">결제금액</th><th>쿠폰</th><th>상태</th></tr></thead>
         <tbody>${rows.map(x => {
           const prof = DATA.profiles.find(p => p.id === x.user_id);
           const statusPill = x.status === 'paid' ? '<span class="pill green">결제완료</span>' : '<span class="pill amber">대기</span>';
+          const isBook = (x.course_key||'').startsWith('book-');
           return `<tr>
             <td class="mono-sm">${fmtDate(x.created_at)}</td>
-            <td>${esc(prof ? prof.name : '—')}<div class="mono-sm">${esc(prof ? prof.email : '')}</div></td>
-            <td>${esc(x.course_name)}</td>
-            <td>${x.price ? won(x.price) : '견적'}${x.coupon_code ? `<div class="mono-sm" style="color:var(--accent)">🎟️ ${esc(x.coupon_code)} (−${won(x.discount)})</div>` : ''}</td>
+            <td><strong>${esc(prof ? prof.name : '—')}</strong><div class="mono-sm">${esc(prof ? prof.email : '')}</div></td>
+            <td>${esc(x.course_name)} ${isBook?'<span class="pill gray">도서</span>':'<span class="pill accent">강좌</span>'}</td>
+            <td class="r"><strong>${x.price ? won(x.price) : '견적'}</strong></td>
+            <td>${x.coupon_code ? `<span class="pill accent">${esc(x.coupon_code)}</span><div class="mono-sm">−${won(x.discount)}</div>` : '<span class="no">—</span>'}</td>
             <td>${statusPill}</td></tr>`;
         }).join('')}</tbody></table>` : '<div class="empty">아직 신청 내역이 없습니다.</div>';
+    }
+
+    /* 신청 추이 콤보 차트 (일별 막대 + 누적 선, 이중 축) */
+    function renderTrendCombo(en) {
+      const el = document.getElementById('trendCombo');
+      if (!el) return;
+      if (!en.length) { el.innerHTML = '<div class="empty">아직 신청 내역이 없습니다.</div>'; return; }
+      const today = new Date(); today.setHours(0,0,0,0);
+      const N = 14, days = [];
+      for (let i=N-1;i>=0;i--){ const d=new Date(today); d.setDate(d.getDate()-i); days.push(d); }
+      const key = d => d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+      const dayCount = {};
+      en.forEach(x=>{ const d=new Date(x.created_at); if(!isNaN(d)){ d.setHours(0,0,0,0); dayCount[key(d)]=(dayCount[key(d)]||0)+1; } });
+      const firstMs = days[0].getTime();
+      let base = en.filter(x=>{ const d=new Date(x.created_at); return !isNaN(d) && d.getTime() < firstMs; }).length;
+      const daily = days.map(d=>dayCount[key(d)]||0);
+      const cum = []; let run = base; daily.forEach(v=>{ run+=v; cum.push(run); });
+      const labels = days.map(d=>(d.getMonth()+1)+'/'+d.getDate());
+
+      const W=640,H=210,padL=30,padR=36,padT=16,padB=26;
+      const n=labels.length, bMax=Math.max(1,...daily), lMax=Math.max(1,...cum);
+      const slot=(W-padL-padR)/n, bw=slot*0.55;
+      const xc=i=>padL+(i+0.5)*slot;
+      const yB=v=>padT+(1-v/bMax)*(H-padT-padB);
+      const yL=v=>padT+(1-v/lMax)*(H-padT-padB);
+      const barsSvg=daily.map((v,i)=>`<rect x="${(xc(i)-bw/2).toFixed(1)}" y="${yB(v).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0,H-padB-yB(v)).toFixed(1)}" rx="2" fill="#c7d2fe"><title>${labels[i]} · 일별 ${v}건</title></rect>`).join('');
+      const linePath=cum.map((v,i)=>`${i?'L':'M'}${xc(i).toFixed(1)} ${yL(v).toFixed(1)}`).join(' ');
+      const dots=cum.map((v,i)=>`<circle cx="${xc(i).toFixed(1)}" cy="${yL(v).toFixed(1)}" r="3" fill="#4f46e5"><title>${labels[i]} · 누적 ${v}건</title></circle>`).join('');
+      const yLeft=[0,bMax].map(v=>`<text x="${padL-5}" y="${(yB(v)+3).toFixed(1)}" text-anchor="end" font-size="9" fill="#9aa">${v}</text>`).join('');
+      const yRight=[0,lMax].map(v=>`<text x="${W-padR+5}" y="${(yL(v)+3).toFixed(1)}" text-anchor="start" font-size="9" fill="#4f46e5">${v}</text>`).join('');
+      const step=Math.ceil(n/7);
+      const xlab=labels.map((l,i)=> i%step===0?`<text x="${xc(i).toFixed(1)}" y="${H-7}" text-anchor="middle" font-size="9" fill="#888" font-family="'JetBrains Mono',monospace">${l}</text>`:'').join('');
+      el.innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="display:block;">
+        ${barsSvg}<path d="${linePath}" fill="none" stroke="#4f46e5" stroke-width="2.5"/>${dots}${yLeft}${yRight}${xlab}
+      </svg>
+      <div style="font-size:11px;color:var(--gray-body);margin-top:8px;display:flex;gap:20px;">
+        <span><span style="color:#c7d2fe;">■</span> 일별 신청 (왼쪽 축)</span>
+        <span><span style="color:#4f46e5;">●</span> 누적 신청 (오른쪽 축)</span>
+      </div>`;
     }
 
     /* ───────── Members ───────── */
