@@ -207,6 +207,26 @@
     .instructor-cred li::before { content: "✓"; color: var(--accent); font-weight: 700; flex-shrink: 0; }
     @media (max-width: 768px) { .instructor-grid { grid-template-columns: 1fr; gap: 28px; } }
 
+    /* ══ BOOKS ══ */
+    #books { background: var(--gray-light); }
+    .books-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .book-card { background: var(--white); border: 1px solid var(--border); display: flex; flex-direction: column;
+                 transition: border-color .2s, box-shadow .2s, transform .2s; }
+    .book-card:hover { border-color: var(--black); box-shadow: 0 12px 36px rgba(0,0,0,.08); transform: translateY(-3px); }
+    .book-cover-wrap { position: relative; background: var(--gray-light); padding: 28px 28px 0; }
+    .book-cover { width: 100%; display: block; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+    .book-flag { position: absolute; top: 16px; right: 16px; z-index: 2; background: var(--accent); color: #fff;
+                 font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 4px 10px; }
+    .book-info { padding: 22px 24px 24px; display: flex; flex-direction: column; flex: 1; }
+    .book-title { font-size: 17px; font-weight: 700; color: var(--black); line-height: 1.3; margin-bottom: 6px; }
+    .book-sub { font-size: 12px; color: var(--accent); font-weight: 700; margin-bottom: 12px; line-height: 1.5; }
+    .book-desc { font-size: 13px; color: var(--gray-body); line-height: 1.7; flex: 1; margin-bottom: 18px; }
+    .book-buy { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .book-price { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; color: var(--black); line-height: 1; }
+    .book-price span { font-family: 'Oxygen', sans-serif; font-size: 13px; color: var(--gray-body); margin-left: 3px; }
+    .book-buy .btn { padding: 11px 22px; }
+    @media (max-width: 860px) { .books-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; } }
+
     #proposal { background: var(--gray-light); }
     .proposal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
     .proposal-step {
@@ -531,8 +551,8 @@
       <div class="nav-links">
         <a href="#proposal">왜 이 강의?</a>
         <a href="#courses">강좌</a>
+        <a href="#books">저서</a>
         <a href="#pricing">가격</a>
-        <a href="#enroll">수강 절차</a>
         <a href="#faq">FAQ</a>
         <a href="https://forms.gle/DcSaMz7kNUxGnNNK8" target="_blank" rel="noopener">문의하기</a>
       </div>
@@ -562,6 +582,7 @@
         <a href="#proposal"   class="mm-chip" onclick="closeMobile()">왜 이 강의?</a>
         <a href="#instructor" class="mm-chip" onclick="closeMobile()">강사 소개</a>
         <a href="#courses"    class="mm-chip" onclick="closeMobile()">강좌</a>
+        <a href="#books"      class="mm-chip" onclick="closeMobile()">저서</a>
         <a href="#pricing"    class="mm-chip" onclick="closeMobile()">가격</a>
         <a href="#enroll"     class="mm-chip" onclick="closeMobile()">수강 절차</a>
         <a href="#faq"        class="mm-chip" onclick="closeMobile()">FAQ</a>
@@ -838,6 +859,65 @@
     </div>
   </section>
 
+  <!-- ══ BOOKS ══ -->
+  <section id="books" class="section">
+    <div class="wrap">
+      <div class="sec-eyebrow"><span class="sec-num">📚</span> Books</div>
+      <h2 class="sec-title">최상훈의 저서</h2>
+      <p class="sec-desc">강의에서 다루는 노하우를 책으로도 만나보세요. 아래에서 바로 구매할 수 있습니다.</p>
+
+      <div class="books-grid">
+
+        <div class="book-card fade-up">
+          <div class="book-cover-wrap">
+            <span class="book-flag">NEW</span>
+            <img src="assets/ai초격차.png" alt="AI 초격차 표지" class="book-cover" />
+          </div>
+          <div class="book-info">
+            <div class="book-title">AI 초격차</div>
+            <div class="book-sub">AI 에이전트 시대, 일하는 방식과 경쟁력이 모두 달라진다</div>
+            <p class="book-desc">AI 에이전트와 함께 일하고, 팀을 이루고, 성과를 만드는 실전 가이드.</p>
+            <div class="book-buy">
+              <div class="book-price">22,000<span>원</span></div>
+              <button class="btn btn-accent" onclick="applyBook('book-aigap')">구매하기</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="book-card fade-up">
+          <div class="book-cover-wrap">
+            <img src="assets/book.png" alt="AI 활용 제안서·기획서 마스터 표지" class="book-cover" />
+          </div>
+          <div class="book-info">
+            <div class="book-title">AI 활용 제안서·기획서 마스터</div>
+            <div class="book-sub">실무에서 바로 쓰는 기획·제안·견적 자동화 전략</div>
+            <p class="book-desc">역할·조건·형식 3요소 쿼리로 제안서를 30분에 완성하는 법.</p>
+            <div class="book-buy">
+              <div class="book-price">19,800<span>원</span></div>
+              <button class="btn btn-dark" onclick="applyBook('book-proposal')">구매하기</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="book-card fade-up">
+          <div class="book-cover-wrap">
+            <img src="assets/dify-ai-book-cover.png" alt="노코드 AI와 Dify 시작하기 표지" class="book-cover" />
+          </div>
+          <div class="book-info">
+            <div class="book-title">노코드 AI와 Dify 시작하기</div>
+            <div class="book-sub">AI 앱 제작 실전서</div>
+            <p class="book-desc">복잡한 AI 서비스를 노코드 워크플로우로 만드는 법.</p>
+            <div class="book-buy">
+              <div class="book-price">24,000<span>원</span></div>
+              <button class="btn btn-dark" onclick="applyBook('book-dify')">구매하기</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- ══ ENROLL FLOW ══ -->
   <section id="enroll" class="section">
     <div class="wrap">
@@ -1038,8 +1118,8 @@
         <div class="modal-step" id="step-confirm">
           <div class="confirm-row"><span class="label">신청자</span><span class="value" id="cfName">—</span></div>
           <div class="confirm-row"><span class="label">이메일</span><span class="value" id="cfEmail">—</span></div>
-          <div class="confirm-row"><span class="label">강좌</span><span class="value" id="cfCourse">—</span></div>
-          <div class="confirm-row"><span class="label">기간</span><span class="value" id="cfDuration">—</span></div>
+          <div class="confirm-row"><span class="label" id="cfCourseLabel">강좌</span><span class="value" id="cfCourse">—</span></div>
+          <div class="confirm-row"><span class="label" id="cfDurationLabel">기간</span><span class="value" id="cfDuration">—</span></div>
           <div class="coupon-box" id="couponBox">
             <span class="coupon-label">쿠폰 코드</span>
             <div class="coupon-input-row">
@@ -1102,6 +1182,14 @@
       claudecode: { name: 'Claude Code 실무 최적화 마스터',          duration: '5주 온라인', price: 300000 },
       enterprise: { name: '기업 특화형 AX 도입 & 프로세스 설계',     duration: '협의 · 온·오프라인', price: 0 },
     };
+    const BOOKS = {
+      'book-aigap':    { name: 'AI 초격차 (도서)',                   duration: '종이책 · 배송', price: 22000, type: 'book' },
+      'book-proposal': { name: 'AI 활용 제안서·기획서 마스터 (도서)', duration: '종이책 · 배송', price: 19800, type: 'book' },
+      'book-dify':     { name: '노코드 AI와 Dify 시작하기 (도서)',    duration: '종이책 · 배송', price: 24000, type: 'book' },
+    };
+    // 강좌 + 도서 통합 조회
+    const CATALOG = Object.assign({}, COURSES, BOOKS);
+    const getItem = key => CATALOG[key];
     const won = n => n.toLocaleString('ko-KR') + '원';
 
     /* ───────── Auth state ───────── */
@@ -1350,14 +1438,17 @@
       document.getElementById('modalSub').textContent = '한 단계만 남았어요';
     }
 
-    /* after login/signup: go to course select (or confirm if course pending) */
+    /* after login/signup: 도서는 바로 확인 단계로, 강좌는 강좌 선택으로 */
+    let pendingDirectConfirm = false;
     function afterAuth() {
-      goSelect();
+      if (pendingDirectConfirm) { selectedCourse = pendingCourse; pendingDirectConfirm = false; goConfirm(); }
+      else goSelect();
     }
 
     /* ───────── Course select ───────── */
     function applyCourse(key) {
       pendingCourse = key;
+      pendingDirectConfirm = false;
       const u = currentUser;
       if (!u) {
         switchAuth('signup');
@@ -1365,6 +1456,22 @@
         openModal();
       } else {
         goSelect();
+        openModal();
+      }
+    }
+
+    /* ───────── Book purchase ───────── */
+    function applyBook(key) {
+      pendingCourse = key;
+      pendingDirectConfirm = true;
+      const u = currentUser;
+      if (!u) {
+        switchAuth('signup');
+        document.getElementById('modalSub').textContent = '가입 후 바로 구매할 수 있어요';
+        openModal();
+      } else {
+        selectedCourse = key;
+        goConfirm();
         openModal();
       }
     }
@@ -1408,7 +1515,7 @@
     }
 
     function renderConfirmPrice() {
-      const c = COURSES[selectedCourse];
+      const c = getItem(selectedCourse);
       const discRow = document.getElementById('confirmDiscountRow');
       if (!c.price) { // 견적(기업) — 쿠폰/금액 없음
         document.getElementById('cfPrice').textContent = '견적 문의';
@@ -1431,9 +1538,12 @@
 
     function goConfirm() {
       if (!selectedCourse) { document.getElementById('selectError').textContent = '강좌를 선택해주세요.'; return; }
-      const u = currentUser; const c = COURSES[selectedCourse];
+      const u = currentUser; const c = getItem(selectedCourse);
+      const isBook = c.type === 'book';
       document.getElementById('cfName').textContent = u.name;
       document.getElementById('cfEmail').textContent = u.email;
+      document.getElementById('cfCourseLabel').textContent = isBook ? '도서' : '강좌';
+      document.getElementById('cfDurationLabel').textContent = isBook ? '구분' : '기간';
       document.getElementById('cfCourse').textContent = c.name;
       document.getElementById('cfDuration').textContent = c.duration;
       // 쿠폰 초기화
@@ -1444,15 +1554,16 @@
       document.getElementById('couponBox').style.display = c.price ? 'block' : 'none';
       renderConfirmPrice();
       goStep('confirm');
-      document.getElementById('modalTitle').textContent = '신청 확인';
-      document.getElementById('modalSub').textContent = '내용을 확인하고 신청하세요';
+      document.getElementById('modalTitle').textContent = isBook ? '구매 확인' : '신청 확인';
+      document.getElementById('modalSub').textContent = isBook ? '내용을 확인하고 구매하세요' : '내용을 확인하고 신청하세요';
+      document.querySelector('#step-confirm .modal-btn').textContent = isBook ? '구매 완료하기' : '신청 완료하기';
     }
 
     async function applyCoupon() {
       const code = document.getElementById('couponInput').value.trim();
       const msg  = document.getElementById('couponMsg');
       const btn  = document.getElementById('couponApplyBtn');
-      const c = COURSES[selectedCourse];
+      const c = getItem(selectedCourse);
       if (!code) { msg.className = 'coupon-msg err'; msg.textContent = '쿠폰 코드를 입력해주세요.'; return; }
 
       if (!SB_CONFIGURED) { // 데모 모드: 50% / 30% / 50000WON 간이 처리
@@ -1484,7 +1595,7 @@
     }
 
     async function doEnroll() {
-      const u = currentUser; const c = COURSES[selectedCourse];
+      const u = currentUser; const c = getItem(selectedCourse);
       const btn = event && event.target;
       let discount = 0, couponCode = null;
 
@@ -1508,12 +1619,13 @@
           couponCode = appliedCoupon.code;
         }
 
-        const { error } = await sb.from('enrollments').insert({
-          user_id: user.id, course_key: selectedCourse, course_name: c.name,
-          price: (c.price - discount), discount, coupon_code: couponCode, status: 'pending'
-        });
+        // 쿠폰을 실제 사용할 때만 coupon_code/discount 전송
+        // (coupons_schema.sql 미적용 환경에서도 일반 구매가 동작하도록)
+        const payload = { user_id: user.id, course_key: selectedCourse, course_name: c.name, price: (c.price - discount), status: 'pending' };
+        if (couponCode) { payload.coupon_code = couponCode; payload.discount = discount; }
+        const { error } = await sb.from('enrollments').insert(payload);
         if (btn) { btn.disabled = false; btn.textContent = '신청 완료하기'; }
-        if (error) { toast('신청 저장 실패: ' + error.message); return; }
+        if (error) { toast('저장 실패: ' + error.message); return; }
       } else {
         if (appliedCoupon && c.price) { discount = discountFor(c, appliedCoupon); couponCode = appliedCoupon.code; }
         const enrolls = JSON.parse(localStorage.getItem('cx_enrolls') || '[]');
@@ -1522,20 +1634,23 @@
       }
 
       const finalPrice = c.price - discount;
+      const isBook = c.type === 'book';
       goStep('success');
       const icon = document.querySelector('#step-success .success-icon');
       icon.textContent = '✓'; icon.style.background = 'var(--green)';
-      document.querySelector('#step-success .success-title').textContent = '신청 완료!';
-      document.getElementById('modalTitle').textContent = '신청 완료';
+      document.querySelector('#step-success .success-title').textContent = (isBook ? '주문' : '신청') + ' 완료!';
+      document.getElementById('modalTitle').textContent = (isBook ? '주문' : '신청') + ' 완료';
       document.getElementById('modalSub').textContent = '감사합니다';
+      const againBtn = document.querySelector('#step-success .modal-btn');
+      if (againBtn) { againBtn.textContent = isBook ? '계속 둘러보기' : '다른 강좌 또 구매'; againBtn.setAttribute('onclick', isBook ? 'closeModal()' : 'goSelect()'); }
       let priceLine;
       if (!c.price) priceLine = '담당자가 견적과 함께 연락드립니다';
       else if (discount > 0) priceLine = `${couponCode} 적용 · 결제 예정 금액 ${won(finalPrice)} <span style="color:var(--gray-body);">(− ${won(discount)})</span>`;
       else priceLine = `결제 예정 금액 ${won(finalPrice)}`;
       document.getElementById('successDesc').innerHTML =
-        `<strong style="color:var(--black);">${c.name}</strong> 신청이 접수되었습니다.<br />` +
+        `<strong style="color:var(--black);">${c.name}</strong> ${isBook ? '주문' : '신청'}이 접수되었습니다.<br />` +
         `${priceLine}<br /><span style="color:var(--gray-body);">${u.email} 로 안내를 보내드릴게요.</span>`;
-      toast('강좌 신청이 완료되었습니다 🎉');
+      toast((isBook ? '도서 주문이' : '강좌 신청이') + ' 완료되었습니다 🎉');
     }
 
     /* ───────── Toast ───────── */

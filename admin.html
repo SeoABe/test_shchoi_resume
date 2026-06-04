@@ -348,6 +348,7 @@
     const COURSE_LABELS = {
       basic: '비전공자 AI 기초', proposal: 'AI 제안서·기획서 마스터',
       claudecode: 'Claude Code 마스터', enterprise: '기업 AX 도입',
+      'book-aigap': '📘 AI 초격차 (도서)', 'book-proposal': '📘 제안서 마스터 (도서)', 'book-dify': '📘 Dify 시작하기 (도서)',
     };
     const won = n => (n || 0).toLocaleString('ko-KR') + '원';
     const fmtDate = s => { try { const d = new Date(s); return d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0'); } catch(e){ return s; } };
