@@ -1,0 +1,5 @@
+# 사용하지 않는 파일 보관 폴더 (커밋 제외)
+.unused/
+
+# 로컬 전용 설정
+.claude/settings.local.json
